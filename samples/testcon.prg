@@ -7,12 +7,6 @@ PROCEDURE Main()
    LOCAL oServer   := NIL
    LOCAL cText := ""
    
-   local chost:="dolphintest.sitasoft.net"
-   local cuser:="test_dolphin"
-   local cpsw:="123456"
-   local cflags:=0
-   local cport:=3306
-   local cdbname:="dolphin_man"
    
    IF ( oServer := ConnectTo() ) == NIL
       RETURN 

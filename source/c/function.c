@@ -74,9 +74,8 @@
 #endif
 #endif //! __XHARBOUR__
 
-const char * SQL2ClipType( long lType, BOOL bLogical );
+const char * SQL2ClipType( long lType, HB_BOOL bLogical );
 
-static PHB_SYMB symClip2MySql = NULL;
 static char * szLang;
 
 
@@ -252,9 +251,9 @@ static MYSQL_RES * hb_MYSQL_RES_par( int iParam )
 HB_FUNC( VAL2ESCAPE )
 {
    char *FromBuffer ;
-   ULONG iSize, iFromSize ;
+   HB_ULONG iSize ;
    char *ToBuffer;
-   BOOL bResult = FALSE ;
+   HB_BOOL bResult = HB_FALSE ;
    iSize= hb_parclen( 1 ) ;
 
    FromBuffer = ( char * )hb_parc( 1 ) ;
@@ -265,7 +264,7 @@ HB_FUNC( VAL2ESCAPE )
      {
        iSize = mysql_escape_string( ToBuffer, FromBuffer, iSize );
        hb_retclenAdopt( ( char * ) ToBuffer, iSize ) ;
-       bResult = TRUE ;
+       bResult = HB_TRUE ;
      }
    }
    if ( !bResult )
@@ -287,9 +286,9 @@ HB_FUNC( MYAND )
 HB_FUNC( MYSQLESCAPE )
 {
    char *FromBuffer ;
-   ULONG iSize, iFromSize ;
+   HB_ULONG iSize ;
    char *ToBuffer;
-   BOOL bResult = FALSE ;
+   HB_BOOL bResult = HB_FALSE ;
    MYSQL * hmysql = ( MYSQL * ) hb_MYSQL_par( 2 );
 
    iSize= hb_parclen( 1 ) ;
@@ -304,7 +303,7 @@ HB_FUNC( MYSQLESCAPE )
         {
           iSize = mysql_real_escape_string( hmysql, ToBuffer, FromBuffer, iSize );
           hb_retclenAdopt( ( char * ) ToBuffer, iSize ) ;
-          bResult = TRUE ;
+          bResult = HB_TRUE ;
         }
       }
       if ( !bResult )
@@ -325,17 +324,17 @@ HB_FUNC( MYSEEK )
    MYSQL_RES * result = ( MYSQL_RES * ) hb_MYSQL_RES_par( 1 );
    MYSQL_ROW row;
    unsigned int uii;
-   int uiStart = ISNUM( 4 ) ? ( unsigned int ) hb_parni( 4 ) - 1 : 0 ;
+   int uiStart = HB_ISNUM( 4 ) ? ( unsigned int ) hb_parni( 4 ) - 1 : 0 ;
    int uiEnd, uiOk = -1;
    unsigned int uiField = hb_parni( 2 ) - 1;
    char * cSearch = ( char *) hb_parc( 3 );
    unsigned long * pulFieldLengths;
-   BOOL bSoft = hb_parl( 6 );
+   HB_BOOL bSoft = hb_parl( 6 );
    
    
-   if (result > 0)
+   if (result)
    {
-      if( ! ISNUM( 5 ) )
+      if( ! HB_ISNUM( 5 ) )
          uiEnd = mysql_num_rows( result );
       else 
          uiEnd = hb_parni( 5 ); 
@@ -411,8 +410,8 @@ HB_FUNC( MYSQLSSLCONNECT ) // -> MYSQL*
 //   const char *szHost = ( const char * ) hb_parc( 1 );
 //   const char *szUser = ( const char * ) hb_parc( 2 );
 //   const char *szPass = ( const char * ) hb_parc( 3 );
-   unsigned int port  = ISNUM( 4 ) ? ( unsigned int ) hb_parni( 4 ) :  MYSQL_PORT;
-   unsigned int flags = ISNUM( 5 ) ? ( unsigned int ) hb_parni( 5 ) :  0;
+   unsigned int port  = HB_ISNUM( 4 ) ? ( unsigned int ) hb_parni( 4 ) :  MYSQL_PORT;
+   unsigned int flags = HB_ISNUM( 5 ) ? ( unsigned int ) hb_parni( 5 ) :  0;
 //   const char *szdb = ISCHAR( 6 ) ? ( const char * ) hb_parc( 6 ): 0;
    PHB_ITEM pcbDecrypt = hb_param( 7, HB_IT_BLOCK );  
     
@@ -425,7 +424,7 @@ HB_FUNC( MYSQLSSLCONNECT ) // -> MYSQL*
       const char *ca = hb_parc(10);
       const char *capath = hb_parc(11);
       const char *cipher = hb_parc(12);
-      HB_BOOL bResult = FALSE;
+      HB_BOOL bResult = HB_FALSE;
 
       bResult = mysql_ssl_set(mysql, key, cert, ca, capath, cipher);
 
@@ -455,8 +454,8 @@ HB_FUNC( MYSQLCONNECT ) // -> MYSQL*
 //   const char *szHost = ( const char * ) hb_parc( 1 );
 //   const char *szUser = ( const char * ) hb_parc( 2 );
 //   const char *szPass = ( const char * ) hb_parc( 3 );
-   unsigned int port  = ISNUM( 4 ) ? ( unsigned int ) hb_parni( 4 ) :  MYSQL_PORT;
-   unsigned int flags = ISNUM( 5 ) ? ( unsigned int ) hb_parni( 5 ) :  0;
+   unsigned int port  = HB_ISNUM( 4 ) ? ( unsigned int ) hb_parni( 4 ) :  MYSQL_PORT;
+   unsigned int flags = HB_ISNUM( 5 ) ? ( unsigned int ) hb_parni( 5 ) :  0;
 //   const char *szdb = ISCHAR( 6 ) ? ( const char * ) hb_parc( 6 ): 0;
    PHB_ITEM pcbDecrypt = hb_param( 7, HB_IT_BLOCK );  
     
@@ -569,8 +568,8 @@ HB_FUNC( MYSQLFREERESULT ) // VOID
 HB_FUNC( MYSQLFETCHROW ) // -> array current row data
 {
    MYSQL_RES *mresult = ( MYSQL_RES * )hb_MYSQL_RES_par( 1 );
-   UINT ui, uiNumFields;
-   ULONG *pulFieldLengths ;
+   HB_UINT ui, uiNumFields;
+   HB_ULONG *pulFieldLengths ;
    MYSQL_ROW mrow;
    PHB_ITEM itRow;
 
@@ -633,7 +632,7 @@ HB_FUNC( MYSQLLISTTBLS ) //->Array List Table
 
    if( mresult )
    {
-      nr = ( LONG ) mysql_num_rows( mresult );
+      nr = ( HB_LONG ) mysql_num_rows( mresult );
 
       itemReturn = hb_itemArrayNew( nr );
       
@@ -670,7 +669,7 @@ HB_FUNC( MYSQLLISTDBS ) //->Array List Databases
       mresult = mysql_list_dbs( mysql, szwild );
    if( mresult )
    {
-      nr = ( LONG ) mysql_num_rows( mresult );
+      nr = ( HB_LONG ) mysql_num_rows( mresult );
 
       itemReturn = hb_itemArrayNew( nr );
       for ( i = 0; i < nr; i++ )
@@ -694,7 +693,7 @@ HB_FUNC( MYSQLLISTDBS ) //->Array List Databases
 //my_ulonglong mysql_num_rows(MYSQL_RES *result)
 HB_FUNC( MYSQLNUMROWS ) // -> The number of rows in the result set.
 {
-   hb_retnll( ( LONGLONG )mysql_num_rows( ( ( MYSQL_RES * )hb_MYSQL_RES_par( 1 ) ) ) );
+   hb_retnll( ( HB_LONGLONG )mysql_num_rows( ( ( MYSQL_RES * )hb_MYSQL_RES_par( 1 ) ) ) );
 }
 
 
@@ -792,9 +791,8 @@ HB_FUNC( MYSQLRESULTSTRUCTURE ) //-> Query result Structure
   PHB_ITEM itemReturn = hb_itemArrayNew( 0 );
   PHB_ITEM itemField = hb_itemNew( NULL );
   MYSQL_FIELD *mfield;
-  unsigned long ulLen;
-  BOOL bCase = hb_parl( 2 );
-  BOOL bNoLogical = hb_param( 3, HB_IT_LOGICAL ) ? hb_parl( 3 ) : FALSE;
+  HB_BOOL bCase = hb_parl( 2 );
+  HB_BOOL bNoLogical = hb_param( 3, HB_IT_LOGICAL ) ? hb_parl( 3 ) : HB_FALSE;
   
   
   if( mresult )
@@ -839,18 +837,16 @@ HB_FUNC( DOLPHINFILLARRAY ) //-> Query result Structure
   PHB_ITEM itemReturn = hb_itemArrayNew( 0 );
   PHB_ITEM itemRow = hb_itemNew( NULL );
   MYSQL_ROW mrow;
-  ULONG *pulFieldLengths ;
-  LONGLONG llRecCount;
-  int i = 0;
+  HB_LONGLONG llRecCount;
   
   if( mresult )
   {
      PHB_ITEM Rec = hb_itemNew( NULL ), Count = hb_itemNew( NULL );
      num_fields = mysql_num_fields( mresult );
-     pulFieldLengths = mysql_fetch_lengths( mresult ) ;
      mysql_data_seek( mresult, 0 );
      llRecCount = mysql_num_rows( mresult );
-     while( mrow = mysql_fetch_row( mresult ) )
+
+     while( ( mrow = mysql_fetch_row( mresult ) ) )
      {
         if ( mrow )
         {
@@ -907,7 +903,7 @@ HB_FUNC( MYSQLUSERESULT ) // -> MYSQL_RES
 
 //------------------------------------------------//
 // convert MySql field type to clipper field type
-const char * SQL2ClipType( long lType, BOOL bNoLogical ) //-> Clipper field type 
+const char * SQL2ClipType( long lType, HB_BOOL bNoLogical ) //-> Clipper field type 
 {
    const char * sType;
    
@@ -990,7 +986,7 @@ const char * SQLType2Char( long lType ) //-> Clipper field type
          break;
          
       case FIELD_TYPE_LONG        :
-         sType = "LONG";
+         sType = "HB_LONG";
          break;
          
       case FIELD_TYPE_FLOAT       :
@@ -1010,7 +1006,7 @@ const char * SQLType2Char( long lType ) //-> Clipper field type
          break;
          
       case FIELD_TYPE_LONGLONG    :
-         sType = "LONGLONG";
+         sType = "HB_LONGLONG";
          break;
          
       case FIELD_TYPE_INT24       :
@@ -1038,7 +1034,7 @@ const char * SQLType2Char( long lType ) //-> Clipper field type
          break;
         
       case FIELD_TYPE_LONG_BLOB   :
-         sType = "LONG BLOB";
+         sType = "HB_LONG BLOB";
          break;
 
       case FIELD_TYPE_BLOB        :
@@ -1098,10 +1094,10 @@ HB_FUNC( SQLTYPE2CHAR )
 // Function taked from mysql.c (xHarbour)
 HB_FUNC( FILETOSQLBINARY )
 {
-   BOOL bResult = FALSE ;
+   HB_BOOL bResult = HB_FALSE ;
    char *szFile = ( char * )hb_parc( 1 );
    HB_FHANDLE fHandle;
-   ULONG iSize;
+   HB_ULONG iSize;
    char *ToBuffer;
    char *FromBuffer;
    if ( szFile && hb_parclen( 1 ) )
@@ -1109,19 +1105,19 @@ HB_FUNC( FILETOSQLBINARY )
      fHandle    = ( HB_FHANDLE ) hb_fsOpen( ( const char * ) szFile,2 );
      if ( fHandle > 0 )
      {
-       iSize      = hb_fsFSize( szFile, FALSE );
+       iSize      = hb_fsFSize( szFile, HB_FALSE );
        if ( iSize > 0 )
        {
          FromBuffer = ( char * ) hb_xgrab( iSize );
          if ( FromBuffer )
          {
-           iSize      = hb_fsReadLarge( fHandle , ( BYTE * ) FromBuffer , iSize );
+           iSize      = hb_fsReadLarge( fHandle , ( HB_BYTE * ) FromBuffer , iSize );
            if ( iSize > 0 )
            {
              ToBuffer   = ( char * ) hb_xgrab( ( iSize*2 ) + 1 );
              if ( ToBuffer )
              {
-               if ISNUM( 2 )
+               if HB_ISNUM( 2 )
                {
                  iSize = mysql_real_escape_string( ( MYSQL * ) hb_MYSQL_par( 2 ), ToBuffer, FromBuffer, iSize );
                }
@@ -1130,7 +1126,7 @@ HB_FUNC( FILETOSQLBINARY )
                  iSize = mysql_escape_string( ToBuffer, FromBuffer, iSize );
                }
                hb_retclenAdopt( ( char * ) ToBuffer, iSize );
-               bResult = TRUE ;
+               bResult = HB_TRUE ;
              }
            }
            hb_xfree( FromBuffer );
@@ -1150,33 +1146,34 @@ HB_FUNC( D_READFILE )
 {
    char *szFile = ( char * )hb_parc( 1 );
    HB_FHANDLE fHandle;
-   ULONG iSize;
-   char *ToBuffer;
+   HB_ULONG iSize;
    char *FromBuffer;
-   BOOL bError = FALSE;
+   HB_BOOL bError = HB_FALSE;
    
    if ( szFile && hb_parclen( 1 ) )
    {
      fHandle    = ( HB_FHANDLE ) hb_fsOpen( ( const char * ) szFile, HB_FA_ALL );
      if ( fHandle > 0 )
      {
-       iSize      = hb_fsFSize( szFile, FALSE );
+       iSize      = hb_fsFSize( szFile, HB_FALSE );
        if ( iSize > 0 )
        {
          FromBuffer = ( char * ) hb_xgrab( iSize );
          if ( FromBuffer )
          {
-           iSize      = hb_fsReadLarge( fHandle , ( BYTE * ) FromBuffer , iSize );
+           iSize      = hb_fsReadLarge( fHandle , ( HB_BYTE * ) FromBuffer , iSize );
          }else
-             bError = TRUE;
+             bError = HB_TRUE;
        }else
-          bError = TRUE;
+          bError = HB_TRUE;
      }else 
-        bError = TRUE;
+        bError = HB_TRUE;
+
+     hb_fsClose( fHandle );
+
    }else 
-      bError = TRUE;
+      bError = HB_TRUE;
     
-   hb_fsClose( fHandle );
    
    if( bError )
       hb_retc( "" ) ;
@@ -1194,8 +1191,8 @@ HB_FUNC( MYSQLEMBEDDED )
    PHB_ITEM pArrayGroup   = hb_param( 3, HB_IT_ARRAY );
    PHB_ITEM pItem;
    int j, argc, iGroups;
-   char **server_options;
-   char **server_groups;
+   char **server_options = NULL;
+   char **server_groups = NULL;
    int iError = 0; 
 
    //build server options
@@ -1271,7 +1268,7 @@ static int _fltcmp( float a, float b ){
 
 //------------------------------------
 
-unsigned int InternalSeek( MYSQL_RES* presult, int iData, unsigned int uiField, BOOL bSoft, char * cSearch )
+unsigned int InternalSeek( MYSQL_RES* presult, int iData, unsigned int uiField, HB_BOOL bSoft, char * cSearch )
 {
    MYSQL_ROW row;
    unsigned long * pulFieldLengths;
@@ -1314,7 +1311,7 @@ unsigned int InternalSeek( MYSQL_RES* presult, int iData, unsigned int uiField, 
    return uii;
 }
 
-static void ChkInverted( int * uStar, int * uEnd, ULONG uValue, BOOL bInvert ) 
+static void ChkInverted( int * uStar, int * uEnd, HB_ULONG uValue, HB_BOOL bInvert ) 
 {
   if( bInvert ){
     *uStar = uValue;
@@ -1329,23 +1326,23 @@ static void ChkInverted( int * uStar, int * uEnd, ULONG uValue, BOOL bInvert )
 HB_FUNC( MYSEEK2 ) 
 {
    MYSQL_RES * result = ( MYSQL_RES * ) hb_MYSQL_RES_par( 1 );
-   unsigned int uii, uii2;
-   int uiStart;
+   unsigned int uii2;
+   int uii;
+   int uiStart=0;
    int uiStart2;
-   int uiEnd, uiOk = -1;
+   int uiEnd=0, uiOk = -1;
    unsigned int uiField = hb_parni( 2 ) - 1;
    char * cSearch = ( char *) hb_parc( 3 );
-   BOOL bSoft     = hb_parl( 6 );
-   BOOL bInverted = hb_pcount() > 6 ? hb_parl( 7 ) : FALSE;
+   HB_BOOL bSoft     = hb_parl( 6 );
+   HB_BOOL bInverted = hb_pcount() > 6 ? hb_parl( 7 ) : HB_FALSE;
    int iMid;
    int iLastFound;
-   char * l;
    
-   ChkInverted( &uiEnd, &uiStart, ( ISNUM( 4 ) ? ( unsigned int ) hb_parni( 4 ) - 1 : 0 ), bInverted );
+   ChkInverted( &uiEnd, &uiStart, ( HB_ISNUM( 4 ) ? ( unsigned int ) hb_parni( 4 ) - 1 : 0 ), bInverted );
    
-   if (result > 0)
+   if (result)
    {
-      if( ! ISNUM( 5 ) )
+      if( ! HB_ISNUM( 5 ) )
         ChkInverted( &uiStart, &uiEnd, mysql_num_rows( result ), bInverted );
       else 
         ChkInverted( &uiStart, &uiEnd, hb_parni( 5 ), bInverted );
@@ -1402,10 +1399,10 @@ HB_FUNC( MYSEEK2 )
 }
 
 //------------------------------------
-unsigned int InternalLocate( MYSQL_RES* presult, int iData, PHB_ITEM pFields, PHB_ITEM pValues, BOOL bSoft )
+unsigned int InternalLocate( MYSQL_RES* presult, int iData, PHB_ITEM pFields, PHB_ITEM pValues, HB_BOOL bSoft )
 {
    MYSQL_ROW row;
-   unsigned int uii;
+   unsigned int uii=-1;
    int i, j;
    long lField, lLen;
    char * cSearch;
@@ -1463,20 +1460,21 @@ HB_FUNC( SET_MYLANG )
 HB_FUNC( MYLOCATE ) 
 {
    MYSQL_RES * result = ( MYSQL_RES * ) hb_MYSQL_RES_par( 1 );
-   unsigned int uii, uii2;
-   int uiStart = ISNUM( 4 ) ? ( unsigned int ) hb_parni( 4 ) - 1 : 0 ;
+   unsigned int uii2;
+   int uii;
+   int uiStart = HB_ISNUM( 4 ) ? ( unsigned int ) hb_parni( 4 ) - 1 : 0 ;
    int uiStart2;
    int uiEnd, uiOk = -1;
    PHB_ITEM pArrayFields  = hb_param( 2, HB_IT_ARRAY );
    PHB_ITEM pArrayValues  = hb_param( 3, HB_IT_ARRAY );
    int iMid;
    int iLastFound;
-   BOOL bSoft = hb_parl( 6 );
+   HB_BOOL bSoft = hb_parl( 6 );
    
    
-   if (result > 0)
+   if (result)
    {
-      if( ! ISNUM( 5 ) )
+      if( ! HB_ISNUM( 5 ) )
          uiEnd = mysql_num_rows( result );
       else 
          uiEnd = hb_parni( 5 ); 
@@ -1499,7 +1497,7 @@ HB_FUNC( MYLOCATE )
          else 
          {
              iLastFound = iMid;
-             uiStart2 = uiStart2 = iLastFound - 1;
+             uiStart2 = iLastFound - 1;
              while( iLastFound > uiStart2 )
              {
                 uii2 = InternalLocate( result, uiStart2, pArrayFields, pArrayValues, bSoft );
@@ -1535,20 +1533,20 @@ HB_FUNC( MYFIND )
 {
    MYSQL_RES * result = ( MYSQL_RES * ) hb_MYSQL_RES_par( 1 );
    MYSQL_ROW row;
-   unsigned int uii;
-   int uiStart = ISNUM( 4 ) ? ( unsigned int ) hb_parni( 4 ) - 1 : 0 ;
+   unsigned int uii=0;
+   int uiStart = HB_ISNUM( 4 ) ? ( unsigned int ) hb_parni( 4 ) - 1 : 0 ;
    int uiEnd, uiOk = -1, i, j;
    PHB_ITEM pArrayFields  = hb_param( 2, HB_IT_ARRAY );
    PHB_ITEM pArrayValues  = hb_param( 3, HB_IT_ARRAY );
    long lField, lencSearch;
    char * cSearch;
    char * cSrc;
-   BOOL bSoft = hb_parl( 6 );
+   HB_BOOL bSoft = hb_parl( 6 );
    char * ctempSearch;
    
-   if (result > 0)
+   if (result)
    {
-      if( ! ISNUM( 5 ) )
+      if( ! HB_ISNUM( 5 ) )
          uiEnd = mysql_num_rows( result );
       else 
          uiEnd = hb_parni( 5 ); 
@@ -1623,7 +1621,7 @@ HB_FUNC( MYBACKUP )
    long lStep = hb_parnl( 5 );
    long lCurrentStep = 0;
    long lRecord = 0;
-   HB_BOOL lCancela = FALSE;
+   HB_BOOL lCancela = HB_FALSE;
    PHB_ITEM pItemCancela;
 
    if( ! mysql_real_query( hMysql, cQuery, hb_parclen( 3 ) ) )
@@ -1727,8 +1725,8 @@ HB_FUNC( MYBACKUP )
 HB_FUNC( _SETMULTISTATEMENT )
 {
   MYSQL * hMysql =  ( MYSQL * )hb_MYSQL_par( 1 );
-  BOOL bStatement = hb_parnl( 2 );
-  BOOL bRet;
+  HB_BOOL bStatement = hb_parnl( 2 );
+  HB_BOOL bRet=HB_FALSE;
   
   if( hMysql )  
   {
@@ -1768,7 +1766,7 @@ HB_FUNC( __OPENCLIPBOARD )
 
 HB_FUNC( __SETCLIPBOARDDATA )
 {
-   ULONG ulLen;
+   HB_ULONG ulLen;
    HGLOBAL hMem;
    void far * pMem;
 
@@ -1783,7 +1781,7 @@ HB_FUNC( __SETCLIPBOARDDATA )
    pMem = GlobalLock( hMem );
    memcpy( ( char * ) pMem, ( char * ) hb_parc( 1 ), ulLen );
    GlobalUnlock( hMem );
-   hb_retl( ( BOOL ) SetClipboardData( CF_TEXT, hMem ) );
+   hb_retl( ( HB_BOOL ) SetClipboardData( CF_TEXT, hMem ) );
 
 }
 

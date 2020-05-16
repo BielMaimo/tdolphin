@@ -1,0 +1,24 @@
+-w0
+-gui
+-inc
+
+-hblib
+
+-olib/${hb_name}
+
+${hb_name}.hbx
+
+-i./include
+
+# PRG SOURCE
+source/prg/tdolpexp.prg
+source/prg/tdolpqry.prg
+source/prg/tdolpsrv.prg
+
+# C SOURCE
+source/c/function.c
+source/c/gerrapi.c
+source/lang/msgen.c
+source/lang/msges.c
+
+tdolphin.hbc

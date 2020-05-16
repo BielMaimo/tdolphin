@@ -1,0 +1,17 @@
+lib/.hbmk
+samples/.hbmk
+lib/libtdolphin.a
+samples/*
+!samples/*.prg
+!samples/*.ch
+!samples/*.ini
+!samples/*.sh
+!samples/*.bat
+!samples/*.dbf
+!samples/*.hbm
+!samples/*.dll
+!samples/makefile
+!samples/*.rc
+!samples/*.res
+!samples/*.res
+

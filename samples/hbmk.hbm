@@ -1,0 +1,9 @@
+${hb_curdir}../tdolphin.hbc
+
+hbct.hbc
+xhb.hbc
+
+-w0 -es2
+-gui
+-inc
+

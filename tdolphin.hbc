@@ -1,0 +1,12 @@
+description=MYSQL WRAPPER LIB
+
+incpaths=./include
+libpaths=lib
+
+libs=${_HB_DYNPREF}${hb_name}${_HB_DYNSUFF}
+
+{bcc}libs=lmysql/omf/libmysql
+{win}libs=mysql/coff/libmysql
+{msvc}libs=mysql/coff/libmysql
+{msvc64}libs=mysql/lib64/libmysql
+{linux}libs=mysqlclient
