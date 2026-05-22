@@ -110,10 +110,11 @@ static char * GetGErrorMsg( HB_ERRCODE iCode, const char * sAux )
     }else
     {
       hb_snprintf( cMsg, strlen( pErrMessage[ iPos ].sDescription ) + 1, "%s", pErrMessage[ iPos ].sDescription );
-      //memcpy( cMsg, pErrMessage[ iPos ].sDescription, strlen( pErrMessage[ iPos ].sDescription ) );     
+      //memcpy( cMsg, pErrMessage[ iPos ].sDescription, strlen( pErrMessage[ iPos ].sDescription ) );
       return cMsg;
     }
   }
+  return NULL;
 }
 
 //--------------------------------------------------------------//  

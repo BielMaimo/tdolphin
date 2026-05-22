@@ -220,9 +220,9 @@ endif
 # --------------------------------------------------------
 ifeq ($(C_COMPILER),BCC)
 	ifeq ($(SAMPLE),)
-		C_FLAGS=-c -D__WIN__ -D$(DEFX) -DHB_LEGACY_TYPES_ON -tWM -I$(PRG_COMP_INC_PATH) -I$(DOLPHIN_INC) -o$@ $<
+		C_FLAGS=-c -D__WIN__ -D$(DEFX) -DHB_LEGACY_TYPES_ON -tWM -w-8071 -w-8060 -w-8004 -I$(PRG_COMP_INC_PATH) -I$(DOLPHIN_INC) -o$@ $<
 	else
-		C_FLAGS=-c -D__WIN__ -D$(DEFX) -DHB_LEGACY_TYPES_ON -M -e$(SAMPLE).exe -I$(PRG_COMP_INC_PATH) -I$(DOLPHIN_INC) -o$@ $<
+		C_FLAGS=-c -D__WIN__ -D$(DEFX) -DHB_LEGACY_TYPES_ON -M -e$(SAMPLE).exe -w-8071 -w-8060 -w-8004 -I$(PRG_COMP_INC_PATH) -I$(DOLPHIN_INC) -o$@ $<
 	endif
 	
 	ifeq ($(LIBMYSQL),)
