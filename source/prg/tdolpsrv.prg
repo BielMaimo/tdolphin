@@ -2340,6 +2340,12 @@ FUNCTION ClipValue2SQL( Value, cType, lTxt, lNoNull ) // Compatibility wint TMys
    DEFAULT lTxt TO .T.
    DEFAULT cType TO ValType( Value )
    DEFAULT lNoNull TO .F.
+   IF ValType(Value)!=cType //Biel
+      //Ciertamente no se cuando esto pasa y dejo el MsgBox para darme cuenta
+      MsgInfo('ClipValue2SQl '+ProcName(1))
+      xBrowse(Value)
+      RETURN Value          //Biel
+   ENDIF                    //Biel
 
    cTxt   := If( lTxt, "'", "" )
 
@@ -2897,7 +2903,16 @@ PROCEDURE Dolphin_DefError( oServer, nError, lInternal, cExtra )
    oError:SubSystem   = If( lInternal, "TDOLPHIN", "MYSQL" )
    oError:SubCode     = nError
    oError:Severity    = 2
-   oError:Description = If( lInternal, "Internal Error:" + DOL_GETERROTEXT( nError ) , oServer:ErrorTxt() ) + " " + cExtra
+   oError:Description = oServer:ErrorTxt() //Biel Oct 2022.
+   /* Me daba un error ACCESS_VIOLATION, no llegaba a salir la ventana de error , pero grababa el fichero de log
+   hb_out.log, parece que el error se producia en
+   Called from DOL_GETERROTEXT(0)
+   Called from DOLPHIN_DEFERROR(2842) in Source\tdolpsrv.prg
+   he quitado la llamada a DOL_GETERROTEXT. Por probar o ver si sale un error mas descriptivo.
+   */
+
+   //Esta es la linea original// oError:Description = If( lInternal, "Internal Error:" + DOL_GETERROTEXT( nError ) , oServer:ErrorTxt() ) + " " + cExtra
+
    Eval( ErrorBlock(), oError )
 RETURN
 

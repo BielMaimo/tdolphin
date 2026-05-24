@@ -738,7 +738,7 @@ METHOD Export() CLASS TDolphinToDbf
    
    cFile = SubStr( ::oMain:cFileName, 1, RAt( ".", ::oMain:cFileName ) - 1 )
    
-   USE ( cFile ) ALIAS ( cAlias ) EXCLUSIVE NEW 
+   USE ( cFile ) ALIAS ( cAlias ) EXCLUSIVE NEW     //NEW añadido por Biel
    
    DO WHILE ! oQry:Eof()
       ( cAlias )->( DbAppend() )
@@ -752,7 +752,7 @@ METHOD Export() CLASS TDolphinToDbf
    IF bOnEnd != NIL 
       Eval( bOnEnd, Self )
    ENDIF
-   (cAlias)->(DBCloseArea()) 
+   (cAlias)->(DBCloseArea()) //Biel
    
 RETURN NIL      
 
