@@ -56,6 +56,7 @@
 #include "dbstruct.ch"
 #include "tdolphin.ch"
 #include "dolerr.ch"
+#include "bielsys.ch"
 
 #ifndef __XHARBOUR__
 //   #include "hbcompat.ch"
@@ -184,7 +185,7 @@ CLASS TDolphinQry
                                 
    METHOD IsEqual( nIdx )                                
 
-   METHOD IsSingleTable() INLINE Len( ::aTables ) == 1  
+   METHOD IsSingleTable() // INLINE Len( ::aTables ) == 1 Comented Biel 1709
    METHOD IsCommand()     INLINE ( ::IsSingleTable() .AND. Len( ::aColumns ) == 0 ) .OR. ;
                                  ( Len( ::aTables ) < 1 .AND. Len( ::aColumns ) >= 1 )
 
@@ -273,7 +274,7 @@ METHOD New( cQuery, uServer, uParams ) CLASS TDolphinQry
       RETURN NIL 
    ENDIF
    
-   ::cQuery  = TransformQueryParams( cQuery, uParams ) 
+   ::cQuery  = TransformQueryParams( cQuery, uParams )
    ::nQryId  = ::oServer:GetQueryId()
    ::oServer:AddQuery( Self )
 
@@ -331,8 +332,12 @@ METHOD BuildDatas( cQuery ) CLASS TDolphinQry
    
    DEFAULT cQuery TO ::cQuery
 
+   cQuery := AllTrim( cQuery )
    aToken := HB_ATokens( cQuery, " " )
-   
+
+   cSelect:=SubStr(cQuery,8,RAt('FROM',cQuery)-9) //Biel
+   ::aColumns = ArrayFromSQLString( cSelect )     //Biel
+
    FOR EACH cItem IN aToken
       IF AScan( aCommands, {| cCommand | cCommand == Upper( cItem ) } ) > 0
          cItem := "|" + cItem
@@ -343,25 +348,23 @@ METHOD BuildDatas( cQuery ) CLASS TDolphinQry
    FOR EACH cItem IN aToken
       cQuery += cItem + " "
    NEXT
-   cQuery := AllTrim( cQuery )
 
    aToken := HB_ATokens( cQuery, "|" )
 
    FOR EACH cItem IN aToken
-   
+
       cFind = Upper( SubStr( cItem, 1, At( " ", cItem ) - 1 ) )
-      
+
       // for comapibility with xharbour
       // xharbour no accept string like switch constant
       nFind = AScan( aCommands, cFind )
-      
+
       SWITCH nFind
-         CASE 1 //"SELECT"
+        /* CASE 1 //"SELECT"    //Comentado por Biel, se procesa mas arriba
             cSelect := AllTrim( SubStr( cItem, 8 ) )
             ::aColumns = ArrayFromSQLString( cSelect )
             EXIT
-
-            
+         */
          CASE 2 //"WHERE"
             IF Empty( ::cWhere )
                ::cWhere  := AllTrim( SubStr( cItem, 7 ) )
@@ -510,18 +513,20 @@ METHOD Delete( lAll ) CLASS TDolphinQry
    DEFAULT lAll TO .F.
 
 #ifndef NOINTERNAL
-   IF !::IsSingleTable()
+   //IF !::IsSingleTable() //Aunque no sea single table, si son JOIN , si puede eliminarse el registro. Biel 1709
+   IF Len( ::aTables ) > 1 //Biel 1709
       ::oServer:nInternalError = ERR_INVALIDDELETE
       ::CheckError()
-      RETURN .F. 
+      RETURN .F.
    ENDIF
-#endif   
-   nPos:=At(' ',::aTables[1])                       
-   IF nPos>0                                        
-      cTable := SubStr( ::aTables[ 1 ],1,nPos )     
-   ELSE                                             
-      cTable := ::aTables[ 1 ]                      
-   ENDIF                                            
+#endif
+   // cTable := ::aTables[ 1 ] //Original
+   nPos:=At(' ',::aTables[1])                       //Biel 1409
+   IF nPos>0                                        //Biel 1409
+      cTable := SubStr( ::aTables[ 1 ],1,nPos )     //Biel 1409
+   ELSE                                             //Biel 1409
+      cTable := ::aTables[ 1 ]                      //Biel 1409
+   ENDIF                                            //Biel 1409
 
    cQry   := "DELETE FROM " + cTable
 
@@ -1144,6 +1149,24 @@ METHOD IsEqual( cnField ) CLASS TDolphinQry
    
 RETURN lEqual
 
+//<begin> Biel 1709
+//----------------------------------------------------//
+
+METHOD IsSingleTable() CLASS TDolphinQry
+   LOCAL lSingleTable:=.T.
+   IF Empty( ::aTables )
+      RETURN !lSingleTable
+   ENDIF
+   IF Len( ::aTables )>1
+      lSingleTable:=.F.
+   ELSE
+      IF At('JOIN',::aTables[1])>0
+         lSingleTable:=.F.
+      ENDIF
+   ENDIF
+RETURN lSingleTable
+//<end> Biel 1709
+
 //----------------------------------------------------//
 
 
@@ -1173,20 +1196,28 @@ METHOD LoadNextQuery() CLASS TDolphinQry
    ENDIF
    
    ::hResult := MySqlStoreResult( oServer:hMysql )
-   
+
    IF ! ( ::hResult == NIL )
-      ::aStructure = MySqlResultStructure( ::hResult, lCaseSen, D_LogicalValue() ) 
+      ::aStructure = MySqlResultStructure( ::hResult, lCaseSen, D_LogicalValue() )
+      /*<Begin> Biel 1709. ::aStructure no contenia el valor por defecto. Con b6Def si lo contiene. b6Def llama MySqlListFields( ::hMysql, cTable, cField ) del API
+        que si devuelve el valor por defecto */
+      IF ::IsSingleTable()
+         FOR EACH aField IN ::aStructure
+            aField[ MYSQL_FS_DEF ] := ::oServer:b6Def( aField[ MYSQL_FS_NAME ], ::aTables[1] )
+         NEXT
+      ENDIF
+      //<end> Biel 1709
       ::nRecCount := MySqlNumRows( ::hResult )
       ::nRecNo    = Max( 1, ::nRecNo )
       ::nFCount   = Len( ::aStructure )
-   
+
       IF ::nRecCount > 0
          ::lEof      := .F.
          ::lBof      := .T.
       ELSE
          ::lEof      := .T.
          ::lBof      := .T.
-      ENDIF   
+      ENDIF
 
 #ifdef USE_HASH
       //Build Hash
@@ -1457,10 +1488,15 @@ RETURN NIL
 METHOD Refresh( lBuild ) CLASS TDolphinQry
 
    DEFAULT lBuild TO .F.
-
+/* Agosto 25.: Esto debe acelerar los refrescos, no se que impacto puede tener.
+      Biel    ..: Entiendo que si no se cambia la sentencia SQL ninguno, ya lo descubriremos.
+      En el fondo usa la sentencia original, sin reconstruir con BuildQuery
+   IF At('DESC DESC',::cOrder)!=0 //Biel 1609
+      ::cOrder:=StrTran(::cOrder,'DESC DESC','DESC') //Habria que buscar porque dobla DESC en cOrder, esto lo soluciona, pero no desde la base del problema.
+   ENDIF
    ::cQuery = BuildQuery( ::aColumns, ::aTables, ::cWhere, ::cGroup, ::cHaving, ::cOrder, ::cLimit )
-
-   ::LoadQuery( lBuild ) 
+ */
+   ::LoadQuery( lBuild )
 
 RETURN ::cQuery
 
@@ -1504,22 +1540,27 @@ METHOD Save() CLASS TDolphinQry
       
       IF ::lAppend
          lSaveOk = .T.
-         lChanged = .T.
+         //lChanged = .T. //Biel 1709
          uValue = ::FieldGet( aField[ MYSQL_FS_NAME ] )
+         IF ValType(uValue)=="N" //Biel 1709. Para quitar esto hay que estar seguro que todos los numericos tienen como valor por defecto cero. De lo contrario Problemas al querer grabar cero.
+            lChanged:=.T.        //Biel 1709
+         ELSE                    //Biel 1709
+            lChanged := !Empty(uValue) //Biel 1709. Version original lChanged siempre es .T.. Creo que mejor asi y al no asignar valores, los toma del DEFAULT del campo
+         ENDIF
       ELSE
 #ifdef USE_HASH
          uValue = ::FieldGet( aField[ MYSQL_FS_NAME ] )
          uOldValue = ::hOldRow[ "_" + aField[ MYSQL_FS_NAME ] ]
-#else 
+#else
 #ifdef __XHARBOUR__
          nIdx = HB_EnumIndex()
 #else
          nIdx = aField:__EnumIndex()
-#endif /*__XHARBOUR__*/ 
+#endif /*__XHARBOUR__*/
          uValue = ::FieldGet( aField[ MYSQL_FS_NAME ] )
          uOldValue = ::aOldRow[ nIdx ]
 #endif /*USE_HASH*/
-         IF ( ! Empty( uValue ) .AND. Empty( uOldValue ) .OR. ! ( uValue == uOldValue ) ) .and. ! lChanged
+         IF ! ( uValue == uOldValue ) .and. ! lChanged //Biel 1709
             lChanged = .T.
          ENDIF
       ENDIF
@@ -1812,8 +1853,14 @@ METHOD VerifyValue( nIdx, cField ) CLASS TDolphinQry
          ELSE
             uValue := cField
          ENDIF
-         EXIT      
+         EXIT
       CASE "T"
+         IF ValType( cField )=="T"    //Biel 1709
+            uValue:=HB_TTOS( cField ) //Biel 1709
+         ELSE                         //Biel 1709
+            uValue:=""                //Biel 1709
+         ENDIF
+         EXIT
       CASE "C"
          IF D_SetPadRight()
             nPad = Min( If( ::aStructure[ nIdx ][ MYSQL_FS_MAXLEN ] > ::aStructure[ nIdx ][ MYSQL_FS_LENGTH ],;
