@@ -50,7 +50,8 @@
  *
  */
 #ifdef __WIN__
-#include <windows.h>   
+#include <winsock2.h>  /* must precede windows.h so SOCKET is defined for mysql headers */
+#include <windows.h>
 #include <winnls.h>
 #endif //#ifdef __WIN__
 #include <hbapi.h>

@@ -1,6 +1,9 @@
 lib/.hbmk
 samples/.hbmk
 lib/libtdolphin.a
+lib/tdolphin.lib
+lib/*.lib
+*.log
 samples/*
 !samples/*.prg
 !samples/*.ch

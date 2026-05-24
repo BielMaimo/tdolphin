@@ -61,8 +61,35 @@ repositorio. Todos los cambios llevan comentario `//Biel` o marcadores `//<begin
 
 ## Compilación
 
+### Con BCC 7.7 (entorno actual — recomendado)
+
 ```
-hbmk2 tdolphin.hbp
+build_bcc77.bat
 ```
 
-Requiere variables de entorno configuradas con uno de los scripts `setenv*.bat`.
+Genera `lib\tdolphin.lib`. Para rebuild completo borrar `lib\.hbmk\` y `lib\tdolphin.lib` primero.
+
+**Rutas del entorno BCC 7.7:**
+- Harbour: `C:\FW\bcc770_32_20250515\`
+- hbmk2: `C:\FW\bcc770_32_20250515\bin\win\bcc\hbmk2.exe`
+- BCC 7.7: `C:\Borland\bcc77\bin\bcc32.exe`
+- Libs Harbour: `C:\FW\bcc770_32_20250515\lib\` (plano, sin subcarpeta)
+
+**Flags especiales:**
+- `-cflag=-w-` — necesario porque BCC 7.7 trata ciertos warnings del Windows SDK como errores
+- `BielSys.ch` debe estar en `.\include\` (ya está en el include path del .hbp)
+
+### Con BCC 5.82 u otros compiladores
+
+Requiere variables de entorno configuradas con uno de los scripts `setenv*.bat`:
+- `setenvh.bat` — Harbour + BCC 5.82
+- `setenvhbcc77.bat` — Harbour + BCC 7.7 (via win-make)
+- `setenvhg.bat` — Harbour + MinGW
+- `setenvhm.bat` — Harbour + MSVC
+
+### Fixes de compatibilidad BCC 7.7 aplicados
+
+| Fichero | Fix |
+|---------|-----|
+| `include/mysql.h` | `winsock2.h` incluido para `_WIN32` (no solo `__LCC__`) — define SOCKET antes de mysql_com.h |
+| `source/c/function.c` | `#include <winsock2.h>` añadido antes de `<windows.h>` |
