@@ -49,11 +49,16 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-#ifdef __WIN__
+#ifdef __BORLANDC__
+#  pragma warn -sig   /* W8071: conversion may lose significant digits */
+#  pragma warn -aus   /* W8004: assigned value is not used             */
+#  pragma warn -pia   /* W8060: possibly incorrect assignment          */
+#endif
+#if defined(__WIN__) || defined(_WIN32)
 #include <winsock2.h>  /* must precede windows.h so SOCKET is defined for mysql headers */
 #include <windows.h>
 #include <winnls.h>
-#endif //#ifdef __WIN__
+#endif /* __WIN__ || _WIN32 */
 #include <hbapi.h>
 #include <hbapiitm.h>
 #include <hbapifs.h>
@@ -1742,7 +1747,7 @@ HB_FUNC( _SETMULTISTATEMENT )
 }
 
 
-#ifdef __WIN__
+#if defined(__WIN__) || defined(_WIN32)
 HB_FUNC( GETDECIMALSEP )
 { 
   LCID lcid = GetThreadLocale();
@@ -1769,7 +1774,7 @@ HB_FUNC( __SETCLIPBOARDDATA )
 {
    HB_ULONG ulLen;
    HGLOBAL hMem;
-   void far * pMem;
+   void * pMem;
 
    ulLen = hb_parclen( 1 );
    hMem = GlobalAlloc( GHND, ulLen + 1 );
@@ -1795,6 +1800,6 @@ HB_FUNC( __CLOSECLIPBOARD )   // ()  --> lSuccess
 {
    hb_retl( CloseClipboard() );
 }
-#endif //__WIN__
+#endif /* __WIN__ || _WIN32 */
 
 
