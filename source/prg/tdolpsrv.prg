@@ -17,7 +17,7 @@ ID:            $Id$
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -77,46 +77,46 @@ CLASS TDolphinSrv
    DATA bOnError       /*Custom manager error message
                          ( Self, nError, lInternal ) */
    DATA bOnBackUp      /*codeblock to evaluate in backup process*/
-             
-   DATA bOnRestore     /*codeblock to evaluate in restore process*/      
-   DATA bOnMultiQry    /*codeblock to evaluate for each Query in METHOD MultiQuery*/      
+
+   DATA bOnRestore     /*codeblock to evaluate in restore process*/
+   DATA bOnMultiQry    /*codeblock to evaluate for each Query in METHOD MultiQuery*/
    DATA bOnAfterQuery   /*codeblock to evaluate after execute a MySql Statement*/
-#ifdef DEBUG 
-   DATA bDebug         /*codeblock to evaluate for each Query, Arg cQuery, ProcName( 1 ), ProcLine( 1 )*/ 
-#endif      
-   
+#ifdef DEBUG
+   DATA bDebug         /*codeblock to evaluate for each Query, Arg cQuery, ProcName( 1 ), ProcLine( 1 )*/
+#endif
+
    DATA cDBName        /*Data base selected*/
    DATA cPassword      /*Data contains the password for user*/
    DATA cHost          /*Host name, may be either a host name or an IP address */
    DATA cUser          /*DAta contains the user's MySQL login ID*/
    DATA cNameHost
-   
+
    DATA cBuild     INIT '25-Jan-12 6:41:25 AM'
-                       
+
    DATA hMysql         /*MySQL connection handle*/
-                       
-   DATA lReConnect     
-   
+
+   DATA lReConnect
+
    DATA Cargo          /*For programmer use*/
-                       
+
    DATA lError         /*Error detection switch*/
-                  
+
    DATA nFlags         /*Client flags*/
    DATA nInternalError /*error manager, no come from MySQL*/
    DATA nPort          /*value is used as the port number for the TCP/IP connection*/
-   
+
    DATA aQueries       /*Array queries actives*/
-   
+
    METHOD New( cHost, cUser, cPassword, nPort, nFlags, bOnError, cDBName )
    METHOD ssl( cHost, cUser, cPassword, nPort, nFlags, bOnError, cDBName, cSslKeyFile, cSslCertFile, cSslCaFile, cCertsPath, cSslCipher )
-   
+
    METHOD AddUser( cHost, cUser, cPassword, cDb, lCreateDB, acPrivilegs, cWithOption )
-                              /*The AddUser() enables system administrators to grant privileges to MySQL user accounts. 
-                                AddUser also serves to specify other account characteristics such as use of secure 
-                                connections and limits on access to server resources. 
-                                To use AddUser(), you must have the GRANT OPTION privilege, 
+                              /*The AddUser() enables system administrators to grant privileges to MySQL user accounts.
+                                AddUser also serves to specify other account characteristics such as use of secure
+                                connections and limits on access to server resources.
+                                To use AddUser(), you must have the GRANT OPTION privilege,
                                 and you must have the privileges that you are granting.*/
-                                
+
    METHOD AddQuery( oQuery )          INLINE AAdd( ::aQueries, oQuery )
                               /*used internally*/
 
@@ -125,210 +125,210 @@ CLASS TDolphinSrv
    METHOD b6Def( cField, cTable )     /* Returns default value for a single field */          // Biel 2606
    METHOD b6DefAll( cTable )          /* Returns hash { fieldname => default } for all fields in one call */ // Biel 2606
 
-   METHOD BeginTransaction()          INLINE ::SqlQuery( "BEGIN" )    
-   
-   METHOD Call( /*...*/ )  /*run a function/procedure with n parameters, 
+   METHOD BeginTransaction()          INLINE ::SqlQuery( "BEGIN" )
+
+   METHOD Call( /*...*/ )  /*run a function/procedure with n parameters,
                              1st parameter must be a function/procedure name,
                              this method does not return any result in query */
 
    METHOD Debug( cText )                     INLINE  If(  ::bDebug != NIL, Eval( ::bDebug, cText, ProcName( 1 ), ProcLine( 1 ) ), )
    METHOD ReturnCall( /*...*/ ) /*same METHOD Call but this return a result set*/
-   
+
    METHOD ChangeEngine( cTable, cType )  INLINE ::SqlQuery( "ALTER TABLE " + D_LowerCase( cTable ) + " ENGINE = " + D_LowerCase( cType ) )
-      
-   METHOD ChangeEngineAll( cType )  
-   
+
+   METHOD ChangeEngineAll( cType )
+
    METHOD CheckError( nError )
-   
+
    METHOD CloseQuery( nId )
-   
-   METHOD CloseAllQuery()             
+
+   METHOD CloseAllQuery()
 
    METHOD Compact( cTable )
- 
-   METHOD Connect( cHost, cUser, cPassword, nPort, nFlags, cDBName )    
+
+   METHOD Connect( cHost, cUser, cPassword, nPort, nFlags, cDBName )
                               /*to establish a connection to a MySQL database engine running on server*/
 
    METHOD SSLConnect( cHost, cUser, cPassword, nPort, nFlags, cDBName, cSslCaFile, cSslCertFile, cSslKeyFile, cSslCipher )
 
 
-   METHOD CommitTransaction()       INLINE ::Debug( "COMMITED" ),  MySqlCommit( ::hMySql ) == 0 
+   METHOD CommitTransaction()       INLINE ::Debug( "COMMITED" ),  MySqlCommit( ::hMySql ) == 0
                               /*Commits the current transaction.*/
 
    METHOD CreateForeign( cName, cTabParent, aIndColName, cTabChild, aIndColRef, ;
-                         lOnDelete, nActionDelete, lOnUpdate, nActionUpdate ) 
+                         lOnDelete, nActionDelete, lOnUpdate, nActionUpdate )
                               /* Create Foreign Key cName Symbol Name */
-   
-   METHOD CreateIndex( cName, cTable, aFNames, nCons, nType )                              
-   
+
+   METHOD CreateIndex( cName, cTable, aFNames, nCons, nType )
+
    METHOD CreateInfo( cTable )
-                              
+
    METHOD CreateTable( cTable, aStruct, cPrimaryKey, cUniqueKey, cAuto, cExtra )
                               /*creates a table with the cTable name*/
 
    METHOD DBCreate( cName, lIfNotExist, cCharSet, cCollate )
                               /* Create Database in current active connection*/
 
-                                
+
    METHOD DBExist( cDB )      INLINE If( ! Empty( cDB ), Len( ::ListDBs( D_LowerCase( cDB ) ) ) > 0, .F. )
                               /* verify is Data Base exist, return logical value*/
 
    METHOD DeleteDB( cDB, lExists )
                               /*Delete Tables*/
-                              
-   METHOD DeleteForeign( cName, cTable ) 
+
+   METHOD DeleteForeign( cName, cTable )
                               /*Delete Foreign*/
 
-   METHOD DeleteIndex( cName, cTable )         
-                              /*Delete Index*/                     
-   
+   METHOD DeleteIndex( cName, cTable )
+                              /*Delete Index*/
+
    METHOD DeleteTables( acTable, lExists )
                               /*Delete Tables*/
-                              
+
    METHOD DropUser( cUser )             INLINE ::SqlQuery( "DROP USER " + cUser )
                               /*Drop User*/
-   
+
    METHOD Embedded( cDataBase, aOptions, aGroups )
-   
-   METHOD End()               
-   
+
+   METHOD End()
+
    METHOD ErrorTxt()          INLINE  If( ::hMysql != NIL, MySqlError( ::hMysql ), "" )
-                              /* Returns a string containing the error message for 
+                              /* Returns a string containing the error message for
                                  the most recently invoked API function that failed.*/
-   
+
    METHOD ErrorNo()           INLINE ::lError := .F., MySqlGetErrNo( ::hMysql )
-                              /* Returns the error code for the most recently invoked 
-                                API function that can succeed or fail. 
+                              /* Returns the error code for the most recently invoked
+                                API function that can succeed or fail.
                                 A return value of zero means that no error occurred.*/
-                                
-   METHOD Execute( cQuery, uParams )   INLINE ::SqlQuery( cQuery, uParams )  
-   
-   METHOD ExecuteScript( cFile ) 
+
+   METHOD Execute( cQuery, uParams )   INLINE ::SqlQuery( cQuery, uParams )
+
+   METHOD ExecuteScript( cFile )
 
    METHOD GetAutoIncrement( cTable )
                                 /*Retrieve next Auto increment value in specified table;
-                                 in current database selected*/   
+                                 in current database selected*/
 
    METHOD GetEngine( cTable, cSchema )
-      
-   METHOD GetServerInfo()       INLINE If( ::hMysql != NIL, MyServerInfo( ::hMysql ), "" ) 
+
+   METHOD GetServerInfo()       INLINE If( ::hMysql != NIL, MyServerInfo( ::hMysql ), "" )
                                 /*Returns a string that represents the server version number.*/
 
-   
-   METHOD GetClientInfo()       INLINE If( ::hMysql != NIL, MyClientInfo(), "" ) 
+
+   METHOD GetClientInfo()       INLINE If( ::hMysql != NIL, MyClientInfo(), "" )
                                 /*Return a string that represents the MySQL client library version.*/
 
-   
+
    METHOD GetPrivileges()
-   
-   METHOD GetQueryId()   
-   
-   
+
+   METHOD GetQueryId()
+
+
    METHOD GetRowsFromTable( cTable )
                                /*Retrieve total row avalaible in  specified table;
-                                in current database selected*/    
+                                in current database selected*/
 
    METHOD GetRowsFromQry( oQuery )
                                /*Retrieve total row avalaible in  specified query;
-                                in current database selected*/    
-   
+                                in current database selected*/
+
    METHOD hInsert( ctable, hValues, cDuplicateKey )
-   
-   METHOD Insert( cTable, aColumns, aValues, cDuplicateKey )  
+
+   METHOD Insert( cTable, aColumns, aValues, cDuplicateKey )
                               /*inserts new rows into an existing table.*/
-                              
-   METHOD InsertFromDbf( cTable, cAlias, nLimit, aStruct, bOnInsert, cDuplicateKey ) 
+
+   METHOD InsertFromDbf( cTable, cAlias, nLimit, aStruct, bOnInsert, cDuplicateKey )
                               /*insert new rows into an existing table from DBF file,
                                 the table should be contain same fieldname that DBF */
 
    METHOD IsAutoIncrement( cField, cTable )
                               /* Verify is a field is Auto Increment*/
-   
+
    METHOD LastDownData( cTable, cCol, uDef )
-   
+
    METHOD LastInsertID()      /*Returns the first automatically generated value that was set for an AUTO_INCREMENT
                                 column by the most recently executed INSERT statement to affect such a column.*/
-   
-   METHOD ListDBs( cWild )    /* Returns a array set consisting of database names on the server 
-                                 that match the simple regular expression specified by the wild parameter. 
-                                 wild may contain the wildcard characters n++%n++ or n++_n++, 
+
+   METHOD ListDBs( cWild )    /* Returns a array set consisting of database names on the server
+                                 that match the simple regular expression specified by the wild parameter.
+                                 wild may contain the wildcard characters n++%n++ or n++_n++,
                                  or may be a "" to match all databases.*/
-   
-   METHOD ListTables( cWild ) /* Returns a array set consisting of tables names in current satabase 
-                                 that match the simple regular expression specified by the wild parameter. 
-                                 wild may contain the wildcard characters n++%n++ or n++_n++, 
+
+   METHOD ListTables( cWild ) /* Returns a array set consisting of tables names in current satabase
+                                 that match the simple regular expression specified by the wild parameter.
+                                 wild may contain the wildcard characters n++%n++ or n++_n++,
                                  or may be a "" to match all tables.*/
-                                 
+
    METHOD MultiQuery( aQuery, lTransaction )
-   
+
    METHOD NextResult() INLINE mysql_next_result( ::hMysql )
-                               /* Use only for MULTIPLE STATEMENT or stored PROCEDURE/FUNCTION */   
-   
+                               /* Use only for MULTIPLE STATEMENT or stored PROCEDURE/FUNCTION */
+
    METHOD Ping()                  INLINE If( MySqlPing( ::hMysql ) > 0, ( ::CheckError(), .F.), .T. )
-                              /* Checks whether the connection to the server is working. 
-                                 If the connection has gone down and auto-reconnect is enabled an attempt 
+                              /* Checks whether the connection to the server is working.
+                                 If the connection has gone down and auto-reconnect is enabled an attempt
                                  to reconnect is made. If the connection is down and auto-reconnect is disabled,
                                  ::ping() returns an error.*/
 
-   METHOD Query( cQuery )   
-   
+   METHOD Query( cQuery )
+
    METHOD ReConnect()
 
-   METHOD RenameUser( cFromUser, cServer, cRename )  
+   METHOD RenameUser( cFromUser, cServer, cRename )
                               /*Rename User*/
-                              
-   METHOD Restore( cFile, lCancel )                              
+
+   METHOD Restore( cFile, lCancel )
 
    METHOD RevokePrivileges( cHost, cUser, cDB, acPrivilegs )
                               /*The RevokePrivileges() enables system administrators to revoke privileges from MySQL accounts.*/
-   
+
 
    METHOD RollBack()                  INLINE ::Debug( "ROLLBACK" ), MySqlRollBack( ::hMysql )
                               /* Rolls back the current transaction.*/
-                             
-   METHOD SelectDB( cDBName ) 
+
+   METHOD SelectDB( cDBName )
                               /*Select data base in current active connection*/
-   
-   
+
+
    METHOD SelectTable( aColumns, aTables, cWhere, cGroup, cHaving, cOrder, cLimit, lWithRoll )
-   
+
    METHOD SetNameServer( cName )
-   
+
    METHOD SetMultiStatement( lOnOf ) INLINE SetMultiStatement( ::hMysql, lOnOf )
-   
-   METHOD SqlQuery( cQuery, uParams )  /*Executes the SQL statement pointed to by cQuery, 
-                              Normally, the string must consist of a single SQL statement and 
-                              you should not add a terminating semicolon (n++;n++) or \g to the statement. 
-                              If multiple-statement execution has been enabled, 
+
+   METHOD SqlQuery( cQuery, uParams )  /*Executes the SQL statement pointed to by cQuery,
+                              Normally, the string must consist of a single SQL statement and
+                              you should not add a terminating semicolon (n++;n++) or \g to the statement.
+                              If multiple-statement execution has been enabled,
                               the string can contain several statements separated by semicolons.*/
- 
+
    METHOD TableExist( cTable )      INLINE If( ! Empty( cTable ), Len( ::ListTables( D_LowerCase( cTable ) ) ) > 0, .F. )
-                              /* verify is table exist, return logical value*/ 
+                              /* verify is table exist, return logical value*/
 
    METHOD TableInitValues( cTable )
-   
-   METHOD TableStructure( cTable )  
-   
-   METHOD hUpdate( cTable, hValues, cWhere ) 
+
+   METHOD TableStructure( cTable )
+
+   METHOD hUpdate( cTable, hValues, cWhere )
                              /*update specific rows into an existing table from a hash, ;
                                the index of hash shold be field name.*/
-                             
+
    METHOD Update( cTable, aColumns, aValues, cWhere )
                              /*update specific row into an existing table.*/
-                                 
+
 ENDCLASS
 
 //----------------------------------------------------//
 
 METHOD New( cHost, cUser, cPassword, nPort, nFlags, cDBName, bOnError, cNameHost, bDecrypt ) CLASS TDolphinSrv
 
-   DEFAULT nPort TO 3306 
+   DEFAULT nPort TO 3306
    DEFAULT cDBName TO ""
-   
+
    DEFAULT bDecrypt TO { | x | x }
 
    ::bDecrypt = bDecrypt
-   
+
    ::cHost          = cHost
    ::cUser          = cUser
    ::cPassword      = cPassword
@@ -339,22 +339,22 @@ METHOD New( cHost, cUser, cPassword, nPort, nFlags, cDBName, bOnError, cNameHost
    ::nInternalError = 0
    ::cDBName        = AllTrim( cDBName )
    ::aQueries       = {}
-      
+
    ::lReConnect     = .T.
 
-   ::hMysql         = ::Connect() 
-   
+   ::hMysql         = ::Connect()
+
    ::CheckError()
    IF ::lError
       ::End()
    ENDIF
-   
+
    DEFAULT  cNameHost TO "TEMP" + Alltrim( Str( ::nServerId++ ) )
-   
+
    ::cNameHost = cNameHost
-   
+
    AAdd( aHost, { Self, cNameHost } )
-   
+
    SetServerDefault( Self )
 
 RETURN Self
@@ -363,13 +363,13 @@ RETURN Self
 
 METHOD ssl( cHost, cUser, cPassword, nPort, nFlags, cDBName, bOnError, cNameHost, bDecrypt, cSslKeyFile, cSslCertFile, cSslCaFile, cCertsPath, cSslCipher ) CLASS TDolphinSrv
 
-   DEFAULT nPort TO 3306 
+   DEFAULT nPort TO 3306
    DEFAULT cDBName TO ""
-   
+
    DEFAULT bDecrypt TO { | x | x }
 
    ::bDecrypt = bDecrypt
-   
+
    ::cHost          = cHost
    ::cUser          = cUser
    ::cPassword      = cPassword
@@ -380,22 +380,22 @@ METHOD ssl( cHost, cUser, cPassword, nPort, nFlags, cDBName, bOnError, cNameHost
    ::nInternalError = 0
    ::cDBName        = AllTrim( cDBName )
    ::aQueries       = {}
-      
+
    ::lReConnect     = .T.
 
    ::hMysql         = ::SSLConnect( cHost, cUser, cPassword, nPort, nFlags, cDBName, cSslKeyFile, cSslCertFile, cSslCaFile, cCertsPath, cSslCipher )
-   
+
    ::CheckError()
    IF ::lError
       ::End()
    ENDIF
-   
+
    DEFAULT  cNameHost TO "TEMP" + Alltrim( Str( ::nServerId++ ) )
-   
+
    ::cNameHost = cNameHost
-   
+
    AAdd( aHost, { Self, cNameHost } )
-   
+
    SetServerDefault( Self )
 
 RETURN Self
@@ -403,13 +403,13 @@ RETURN Self
 //----------------------------------------------------//
 
 METHOD Embedded( cDataBase, aOptions, aGroups, bOnError, cNameHost ) CLASS TDolphinSrv
-   
+
    ::lError         = .F.
    ::bOnError       = bOnError
    ::nInternalError = 0
    ::cDBName        = cDataBase
    ::aQueries       = {}
-   
+
    DEFAULT aGroups TO {}
    DEFAULT aOptions TO {}
 
@@ -429,7 +429,7 @@ METHOD Embedded( cDataBase, aOptions, aGroups, bOnError, cNameHost ) CLASS TDolp
    ::cNameHost = cNameHost
 
    AAdd( aHost, { Self, cNameHost } )
-   
+
    SetServerDefault( Self )
 
 
@@ -452,7 +452,7 @@ METHOD AddUser( cHost, cUser, cPassword, cDb, lCreateDB, acPrivilegs, cWithOptio
    DEFAULT lCreateDB TO .f.
    DEFAULT acPrivilegs TO "ALL PRIVILEGES"
    DEFAULT cWithOption     TO ""
-   
+
 
    IF Empty( cHost ) .OR. Empty( cUser ) .OR. Empty( cDb )
       RETURN lReturn
@@ -466,13 +466,13 @@ METHOD AddUser( cHost, cUser, cPassword, cDb, lCreateDB, acPrivilegs, cWithOptio
    IF !::DBExist( cDb ) .AND. lCreateDB
       ::DBCreate( cDb )
    ENDIF
-   
+
    IF ValType( acPrivilegs ) == "A"
       cPriv = SQLStringFromArray( acPrivilegs )
-   ELSE 
+   ELSE
       cPriv = acPrivilegs
    ENDIF
-   
+
 
    cQuery  := "GRANT " + cPriv + " ON " + cDb + ".* TO "
    cQuery  += "'" + cUser + "'@'" + cHost + "'"
@@ -480,7 +480,7 @@ METHOD AddUser( cHost, cUser, cPassword, cDb, lCreateDB, acPrivilegs, cWithOptio
       cQuery  += " IDENTIFIED BY "
       cQuery  += "'" + cPassword + "'"
    ENDIF
-   
+
    IF !Empty( cWithOption )
       cQuery += " WITH " + cWithOption
    ENDIF
@@ -506,7 +506,7 @@ METHOD Backup( aTables, cFile, lDrop, lOverwrite, nStep, cHeader, cFooter, lCanc
    LOCAL nPage  := 0
    LOCAL nError := 0
    LOCAL uField, cType
-   
+
    DEFAULT lOverwrite TO .F.
    DEFAULT lDrop TO .F.
    DEFAULT nStep TO 500
@@ -518,7 +518,7 @@ METHOD Backup( aTables, cFile, lDrop, lOverwrite, nStep, cHeader, cFooter, lCanc
    DEFAULT bOnBackUp TO ::bOnBackUp
 
    aTables = CheckArray( aTables )
-   
+
    ::bOnBackUp = bOnBackUp
 
 #ifndef NOINTERNAL
@@ -539,37 +539,37 @@ METHOD Backup( aTables, cFile, lDrop, lOverwrite, nStep, cHeader, cFooter, lCanc
       ::CheckError()
       RETURN .F.
    ENDIF
-#endif 
+#endif
 
-   IF File( cFile ) 
-     IF lOverwrite 
+   IF File( cFile )
+     IF lOverwrite
         IF FErase( cFile ) < 0
 #ifndef NOINTERNAL
            ::nInternalError = ERR_CANNOTCREATEBKFILE
            ::CheckError()
-#endif         
+#endif
            RETURN .F.
         ENDIF
         FClose( FCreate( cFile ) )
      ENDIF
-   ELSE 
+   ELSE
       FClose( FCreate( cFile ) )
-   ENDIF 
-   
+   ENDIF
+
    IF( ( hFile := FOpen( cFile, FO_WRITE ) ) != -1 )
       FSeek( hFile, 0, FS_END )
-   ELSE 
+   ELSE
 #ifndef NOINTERNAL
       ::nInternalError = ERR_OPENBACKUPFILE
       ::CheckError()
-#endif         
+#endif
       RETURN .F.
-   ENDIF       
-   
+   ENDIF
+
    IF ::bOnBackUp != NIL
       Eval( ::bOnBackUp, ST_STARTBACKUP )
    ENDIF
-   
+
    cText += cHeader + CRLF
 
    FOR EACH cTable IN aTables
@@ -578,7 +578,7 @@ METHOD Backup( aTables, cFile, lDrop, lOverwrite, nStep, cHeader, cFooter, lCanc
 
    IF lDrop
       cText += CRLF
-      cText += CRLF   
+      cText += CRLF
       cText += "** Create database **"
       cText += CRLF
       cText += "CREATE DATABASE IF NOT EXISTS " + ::cDBName
@@ -586,10 +586,10 @@ METHOD Backup( aTables, cFile, lDrop, lOverwrite, nStep, cHeader, cFooter, lCanc
 
 
    nTotTable = Len( aTables )
-   
-   FWrite( hFile, cText )   
-   cText = ""   
-   
+
+   FWrite( hFile, cText )
+   cText = ""
+
    FOR EACH cTable IN aTables
       cText += CRLF
       cText += CRLF
@@ -597,16 +597,16 @@ METHOD Backup( aTables, cFile, lDrop, lOverwrite, nStep, cHeader, cFooter, lCanc
          EXIT
       ENDIF
       cTable = D_LowerCase( cTable )
-      
-   
+
+
       IF ::bOnBackUp != NIL
-#ifdef __XHARBOUR__      
+#ifdef __XHARBOUR__
          nCurrTable = HB_EnumIndex()
-#else 
+#else
          nCurrTable =  cTable:__EnumIndex()
-#endif   
-         Eval( ::bOnBackUp, ST_LOADINGTABLE, cTable, nTotTable, nCurrTable )      
-      ENDIF            
+#endif
+         Eval( ::bOnBackUp, ST_LOADINGTABLE, cTable, nTotTable, nCurrTable )
+      ENDIF
       nTRow := ::GetRowsFromTable( cTable )
       cText  += "** BEGIN " + cTable + CRLF
       IF lDrop
@@ -636,8 +636,8 @@ METHOD Backup( aTables, cFile, lDrop, lOverwrite, nStep, cHeader, cFooter, lCanc
       ENDIF
 
       nPage := 0
-      
-      FWrite( hFile, cText )      
+
+      FWrite( hFile, cText )
       cText = ""
       FOR nRecno := 0 TO nTRow STEP nStep
 //
@@ -646,16 +646,16 @@ METHOD Backup( aTables, cFile, lDrop, lOverwrite, nStep, cHeader, cFooter, lCanc
 //         ENDIF
 //
          IF ::bOnBackUp != NIL
-            Eval( ::bOnBackUp, ST_FILLBACKUP, cTable, nTotTable, nCurrTable, nRecno )      
-         ENDIF   
+            Eval( ::bOnBackUp, ST_FILLBACKUP, cTable, nTotTable, nCurrTable, nRecno )
+         ENDIF
 
-         cQry := "SELECT * FROM " + cTable + " LIMIT " 
+         cQry := "SELECT * FROM " + cTable + " LIMIT "
          cQry += AllTrim( Str( nRecno ) ) + ", "
          cQry += AllTrim( Str( nStep ) )
 //         oQry := ::Query( cQry )
 
          if ( lCancel := MyBackUp( ::hMySql, hFile, cQry, cText2, nStep, ::bOnBackUp, cTable, nTotTable, nCurrTable, nRecno ) )
-            exit 
+            exit
          endif
 
 //         WHILE !oQry:eof() .AND. ! lCancel
@@ -682,7 +682,7 @@ METHOD Backup( aTables, cFile, lDrop, lOverwrite, nStep, cHeader, cFooter, lCanc
 //            oQry:Skip()
 //            IF oQry:Eof()
 //               cText := Left( cText, len( cText ) - 1 ) + CRLF
-//            ENDIF            
+//            ENDIF
 //         ENDDO
 //         IF nTRow > nRecno
 //            FWrite( hFile, cText2 + cText )
@@ -693,7 +693,7 @@ METHOD Backup( aTables, cFile, lDrop, lOverwrite, nStep, cHeader, cFooter, lCanc
       NEXT
       IF ::bOnBackUp != NIL
          Eval( ::bOnBackUp, ST_FILLBACKUP, cTable, nTotTable, nCurrTable, Min( nRecno, nTRow ) )
-      ENDIF         
+      ENDIF
       cText = CRLF
       cText += "UNLOCK TABLES"
       cText += CRLF
@@ -710,11 +710,11 @@ METHOD Backup( aTables, cFile, lDrop, lOverwrite, nStep, cHeader, cFooter, lCanc
          cFooter = "-- Dump completed on " + DToC( Date() ) + " " + Time() + CRLF
       ENDIF
       cText += CRLF + cFooter
-       
+
       IF ::bOnBackUp != NIL
          Eval( ::bOnBackUp, ST_ENDBACKUP, cFile )
-      ENDIF   
-   
+      ENDIF
+
       FWrite( hFile, cText )
       FClose( hFile )
       RETURN .F.
@@ -722,7 +722,7 @@ METHOD Backup( aTables, cFile, lDrop, lOverwrite, nStep, cHeader, cFooter, lCanc
       FClose( hFile )
       IF ::bOnBackUp != NIL
          Eval( ::bOnBackUp, ST_BACKUPCANCEL )
-      ENDIF   
+      ENDIF
    ENDIF
 
 RETURN .T.
@@ -730,7 +730,7 @@ RETURN .T.
 //---------------------------------------------//
 
 METHOD Call( ... ) CLASS TDolphinSrv
-   LOCAL aParams := hb_aParams()   
+   LOCAL aParams := hb_aParams()
    LOCAL n
    LOCAL cExecute := "call "
 #ifndef NOINTERNAL
@@ -741,59 +741,59 @@ METHOD Call( ... ) CLASS TDolphinSrv
    ::CheckError()
 
    ENDIF
-   
+
    IF ::lError
-       RETURN ::lError 
-   ENDIF   
-   
+       RETURN ::lError
+   ENDIF
+
 #endif
 
    cExecute += aParams[ 1 ] + "( "
 
    FOR n = 2 TO Len( aParams )
       cExecute += ClipValue2Sql( aParams[ n ] ) + ","
-   NEXT 
+   NEXT
 
    cExecute = Left( cExecute, Len( cExecute ) - 1 ) + ")"
    ::SqlQuery( cExecute )
    ::NextResult()
-   
+
 RETURN ! ::lError
 
 //---------------------------------------------//
 
 METHOD ReturnCall( ... ) CLASS TDolphinSrv
-   LOCAL aParams := hb_aParams()   
+   LOCAL aParams := hb_aParams()
    LOCAL n
    LOCAL oQry
    LOCAL cExecute := "call "
 
 #ifndef NOINTERNAL
-   
+
    IF Len( aParams ) < 1 .or. ! hb_IsString( aParams[ 1 ] )
 
    ::nInternalError = ERR_INVALID_PARAMETER_CALL
    ::CheckError()
 
    ENDIF
-   
+
    IF ::lError
-       RETURN ::lError 
-   ENDIF   
-   
+       RETURN ::lError
+   ENDIF
+
 #endif
 
    cExecute += aParams[ 1 ] + "( "
-   
+
    FOR n = 2 TO Len( aParams )
       cExecute += ClipValue2Sql( aParams[ n ] ) + ","
-   NEXT 
-   
+   NEXT
+
    cExecute = Left( cExecute, Len( cExecute ) - 1 ) + ")"
-   
+
    oQry = ::Query( cExecute )
    ::NextResult()
-   
+
 RETURN oQry
 
 //---------------------------------------------//
@@ -812,7 +812,7 @@ RETURN NIL
 METHOD CheckError( nError, cExtra ) CLASS TDolphinSrv
 
    LOCAL lInternal := .F.
-   
+
    ::lError = .F.
 
    IF ! hb_IsPointer( ::hMysql )
@@ -820,24 +820,24 @@ METHOD CheckError( nError, cExtra ) CLASS TDolphinSrv
    ELSE
       DEFAULT nError TO ::ErrorNo()
    ENDIF
-   
-   IF nError == 0 
-      IF ::nInternalError > 0 
+
+   IF nError == 0
+      IF ::nInternalError > 0
          nError = ::nInternalError
          lInternal = .T.
          ::lError    = .T.
       ENDIF
-   ELSE 
-      ::lError := .T.   
+   ELSE
+      ::lError := .T.
    ENDIF
-   
+
    IF ::lError
       IF nError == CR_SERVER_GONE_ERROR .AND. ::lReConnect
          ::ReConnect()
       ELSE
          IF ::bOnError != nil
             Eval( ::bOnError, Self, nError, lInternal, cExtra )
-         ELSE 
+         ELSE
             Dolphin_DefError( Self, nError, lInternal, cExtra )
          ENDIF
       ENDIF
@@ -853,32 +853,32 @@ METHOD CloseQuery( nId ) CLASS TDolphinSrv
 
    LOCAL nPos := AScan( ::aQueries, {| o | o:nQryId == nId } )
    LOCAL oQry
-   
-   IF nPos > 0 
+
+   IF nPos > 0
       oQry = ::aQueries[ nPos ]
       IF oQry:hResult != NIL
          //MySqlFreeResult( oQry:hResult )/* NOTE: Deprecated */
-         oQry:hResult = NIL 
-      ENDIF 
+         oQry:hResult = NIL
+      ENDIF
       ADel( ::aQueries, nPos )
       ASize( ::aQueries, Len( ::aQueries ) - 1 )
    ENDIF
 
-RETURN NIL 
+RETURN NIL
 
 
 //----------------------------------------------------//
 
-METHOD CloseAllQuery() CLASS TDolphinSrv           
+METHOD CloseAllQuery() CLASS TDolphinSrv
 
-   LOCAL oQry 
-   
+   LOCAL oQry
+
    FOR EACH oQry IN ::aQueries
-    
-      ::CloseQuery( oQry:nQryId ) 
-      
+
+      ::CloseQuery( oQry:nQryId )
+
    NEXT
-   
+
 RETURN NIL
 
 //----------------------------------------------------//
@@ -906,14 +906,14 @@ RETURN NIL
 
 METHOD Connect( cHost, cUser, cPassword, nPort, nFlags, cDBName ) CLASS TDolphinSrv
 
-   
+
    DEFAULT cHost     TO ::cHost
    DEFAULT cUser     TO ::cUser
    DEFAULT cPassword TO ::cPassword
    DEFAULT nPort     TO ::nPort
    DEFAULT nFlags    TO ::nFlags
    DEFAULT cDBName   TO ::cDBName
-   
+
 
 RETURN MySqlConnect( cHost, cUser, cPassword, nPort, nFlags, cDBName, ::bDecrypt )
 
@@ -921,14 +921,14 @@ RETURN MySqlConnect( cHost, cUser, cPassword, nPort, nFlags, cDBName, ::bDecrypt
 
 METHOD SSLConnect( cHost, cUser, cPassword, nPort, nFlags, cDBName, cSslKeyFile, cSslCertFile, cSslCaFile, cCertsPath, cSslCipher ) CLASS TDolphinSrv
 
-   
+
    DEFAULT cHost     TO ::cHost
    DEFAULT cUser     TO ::cUser
    DEFAULT cPassword TO ::cPassword
    DEFAULT nPort     TO ::nPort
    DEFAULT nFlags    TO ::nFlags
    DEFAULT cDBName   TO ::cDBName
-   
+
 
 RETURN MySqlSSLConnect( cHost, cUser, cPassword, nPort, nFlags, cDBName, ::bDecrypt, cSslKeyFile, cSslCertFile, cSslCaFile, cCertsPath, cSslCipher )
 
@@ -940,7 +940,7 @@ METHOD CreateForeign( cName, cTabParent, aIndColName, cTabChild, aIndColRef, ;
    LOCAL cQuery := "ALTER TABLE "
    LOCAL cField
    LOCAL aFOREIGN_CONST  := { "RESTRICT", "CASCADE", "SET NULL", "NO ACTION" }
-   
+
    IF Upper( ::GetEngine( cTabParent ) ) != "INNODB"
       RETURN .F.
    ENDIF
@@ -948,34 +948,34 @@ METHOD CreateForeign( cName, cTabParent, aIndColName, cTabChild, aIndColRef, ;
       RETURN .F.
    ENDIF
 
-   // NOTE: aFNames each item can be array 2 position (1) column name (2) orden type 
+   // NOTE: aFNames each item can be array 2 position (1) column name (2) orden type
    // like numeric, (1) ASC, (2) DESC ie. { "FIELD_NAME", 1 }
    DEFAULT nActionDelete TO 4
    DEFAULT nActionUpdate TO 4
-   
+
 
    cQuery += D_LowerCase( cTabParent ) + " ADD "
    cQuery += If( !Empty( cName ), "CONSTRAINT "+ cName +" " , "" )
-   cQuery += "FOREIGN KEY (" 
+   cQuery += "FOREIGN KEY ("
 
    FOR EACH cField IN aIndColName
       IF ValType( cField ) == "A"
          cQuery += cField[ 1 ] + ","
-      ELSE 
+      ELSE
          cQuery += cField + ","
-      ENDIF 
+      ENDIF
    NEXT
-   
+
    //remove last coma(,)
    cQuery = Left( cQuery, Len( cQuery ) - 1 ) + ") "
-   
-   cQuery += "REFERENCES "+D_LowerCase( cTabChild ) + " (" 
+
+   cQuery += "REFERENCES "+D_LowerCase( cTabChild ) + " ("
    FOR EACH cField IN aIndColRef
       IF ValType( cField ) == "A"
          cQuery += cField[ 1 ] + ","
-      ELSE 
+      ELSE
          cQuery += cField + ","
-      ENDIF 
+      ENDIF
    NEXT
 
    //remove last coma(,)
@@ -984,7 +984,7 @@ METHOD CreateForeign( cName, cTabParent, aIndColName, cTabChild, aIndColRef, ;
    IF lOnDelete
       cQuery += "ON DELETE "+aFOREIGN_CONST[ nActionDelete ]+" "
    ENDIF
-   
+
    IF lOnUpdate
       cQuery += "ON UPDATE "+aFOREIGN_CONST[ nActionDelete ]+" "
    ENDIF
@@ -1000,29 +1000,29 @@ METHOD CreateIndex( cName, cTable, aFNames, nCons, nType ) CLASS TDolphinSrv
    LOCAL cConst, cType, cOrden
    LOCAL aIDX_CONST  := { "UNIQUE", "FULLTEXT", "SPATIAL", "PRIMARY KEY" }
    LOCAL aIDX_ORDEN  := { "ASC", "DESC" }
-   LOCAL aIDX_TYPE   := { "BTREE", "HASH", "RTREE" }   
+   LOCAL aIDX_TYPE   := { "BTREE", "HASH", "RTREE" }
 
-   // NOTE: aFNames each item can be array 2 position (1) column name (2) orden type 
+   // NOTE: aFNames each item can be array 2 position (1) column name (2) orden type
    // like numeric, (1) ASC, (2) DESC ie. { "FIELD_NAME", 1 }
    DEFAULT nCons TO 0
    DEFAULT nType TO 0
-   
 
-   cQuery += D_LowerCase( cTable ) + " ADD " 
-   cQuery += If( nCons == 0, "INDEX ", aIDX_CONST[ nCons ] + " " ) 
+
+   cQuery += D_LowerCase( cTable ) + " ADD "
+   cQuery += If( nCons == 0, "INDEX ", aIDX_CONST[ nCons ] + " " )
    cQuery += D_LowerCase( cName ) + " ("
 
    FOR EACH cField IN aFNames
       IF ValType( cField ) == "A"
          cQuery += cField[ 1 ] + " " + aIDX_ORDEN[ cField[ 2 ] ] + ","
-      ELSE 
+      ELSE
          cQuery += cField + ","
-      ENDIF 
+      ENDIF
    NEXT
-   
+
    //remove last coma(,)
    cQuery = Left( cQuery, Len( cQuery ) - 1 ) + ") "
-   cQuery += If( nType == 0, "", aIDX_TYPE[ nType ] ) 
+   cQuery += If( nType == 0, "", aIDX_TYPE[ nType ] )
 
 RETURN ::SqlQuery( cQuery )
 
@@ -1053,21 +1053,21 @@ RETURN cInfo
 METHOD CreateTable( cTable, aStruct, cPrimaryKey, cUniqueKey, cAuto, cExtra, lIfNotExist, lVer ) CLASS TDolphinSrv
 
    LOCAL aField
-   LOCAL cQuery   
+   LOCAL cQuery
    LOCAL bDefault := { | aRow | If( ! ValType( aRow[ DBS_DEFAULT ] ) == "U", ;
                                      " DEFAULT " + ClipValue2SQL( aRow[ DBS_DEFAULT ] ), ;
                                      "" ) }
-     
+
    LOCAL lAutoIncrement
    LOCAL lRet := .T.
-   LOCAL nLenStruct := If( ! Empty( aStruct ), Len( aStruct ), 0 ) 
+   LOCAL nLenStruct := If( ! Empty( aStruct ), Len( aStruct ), 0 )
 
    DEFAULT lVer TO .T.
    DEFAULT lIfNotExist TO .T.
    DEFAULT cPrimaryKey TO ""
    DEFAULT cUniqueKey TO ""
    DEFAULT cExtra TO ""
-   
+
 
    cPrimaryKey = If( ! Empty( cPrimaryKey ), D_LowerCase( cPrimaryKey ), "" )
    cAuto       = If( ! Empty( cAuto ), D_LowerCase( cAuto ), "" )
@@ -1079,37 +1079,37 @@ METHOD CreateTable( cTable, aStruct, cPrimaryKey, cUniqueKey, cAuto, cExtra, lIf
 
    IF lVer .AND. nLenStruct > 0
       ::CheckError( VerifyStructure( aStruct ) )
-       IF ! ::lError .AND. ! Empty( cPrimarykey ) 
+       IF ! ::lError .AND. ! Empty( cPrimarykey )
          IF AScan( aStruct, {| aRow | AllTrim( D_LowerCase( aRow[ DBS_NAME ] ) ) == cPrimarykey } ) == 0
             ::nInternalError = ERR_INVALID_STRUCT_PRIKEY
             ::CheckError()
          ENDIF
       ENDIF
-   
+
       IF ! ::lError .AND. ! Empty( cUniquekey )
          IF AScan( aStruct, {| aRow | AllTrim( D_LowerCase( aRow[ DBS_NAME ] ) ) == cUniquekey } ) == 0
             ::nInternalError = ERR_INVALID_STRUCT_UNIQUE
             ::CheckError()
          ENDIF
       ENDIF
-      
+
       IF ! ::lError .AND. ! Empty( cAuto )
          IF AScan( aStruct, {| aRow | AllTrim( D_LowerCase( aRow[ DBS_NAME ] ) ) == cAuto } ) == 0
             ::nInternalError = ERR_INVALID_STRUCT_AUTO
             ::CheckError()
          ENDIF
-      ENDIF      
+      ENDIF
 
       IF ::lError
-         RETURN ::lError 
+         RETURN ::lError
       ENDIF
    ENDIF
-#endif   
+#endif
 
    cQuery := "CREATE TABLE " + If( lIfNotExist, " IF NOT EXISTS ", "" ) + D_LowerCase( cTable ) + If( nLenStruct > 0, " (", " " )
 
    IF nLenStruct > 0
-   
+
       FOR EACH aField IN aStruct
          aField[ DBS_TYPE ]:= upper(aField[ DBS_TYPE ])
          SWITCH aField[ DBS_TYPE ]
@@ -1117,116 +1117,116 @@ METHOD CreateTable( cTable, aStruct, cPrimaryKey, cUniqueKey, cAuto, cExtra, lIf
             cQuery += aField[ DBS_NAME ] + " char(" + AllTrim( Str( aField[ DBS_LEN ] ) ) + ")" + ;
                       fNotNull( aField, cPrimaryKey, cAuto ) + Eval( bDefault, aField ) + ","
             EXIT
-   
+
          CASE "M"
             cQuery += aField[ DBS_NAME ] + " text" + fNotNull( aField, cPrimaryKey, cAuto ) + ","
             EXIT
-   
+
          CASE "N"
             lAutoIncrement = D_LowerCase( aField[ DBS_NAME ] ) == cAuto
-            
-            IF aField[ DBS_DEC ] == 0 .AND. aField[ DBS_LEN ] <= 18 
+
+            IF aField[ DBS_DEC ] == 0 .AND. aField[ DBS_LEN ] <= 18
                IF lAutoIncrement
                   cQuery += aField[ DBS_NAME ] + " int("       + AllTrim( Str( aField[ DBS_LEN ] ) ) + ")"
                ELSE
                   DO CASE
                      CASE aField[ DBS_LEN ] <= 4
                         cQuery += aField[ DBS_NAME ] + " smallint("  + AllTrim( Str( aField[ DBS_LEN ] ) ) + ")"
-      
+
                      CASE aField[ DBS_LEN ] <= 6
                         cQuery += aField[ DBS_NAME ] + " mediumint(" + AllTrim( Str( aField[ DBS_LEN ] ) ) + ")"
-      
+
                      CASE aField[ DBS_LEN ] <= 9
                         cQuery += aField[ DBS_NAME ] + " int("       + AllTrim( Str( aField[ DBS_LEN ] ) ) + ")"
-      
+
                      OTHERWISE
                         cQuery += aField[ DBS_NAME ] + " bigint("    + AllTrim( Str( aField[ DBS_LEN ] ) ) + ")"
-      
+
                   ENDCASE
                ENDIF
 
                cQuery += fNotNull( aField, cPrimaryKey, cAuto ) + ;
                          If( lAutoIncrement, " auto_increment", ;
                              Eval( bDefault, aField ) ) + ","
-   
+
             ELSE
                cQuery += aField[ DBS_NAME ] + " decimal(" + AllTrim( Str( aField[ DBS_LEN ] ) ) + "," + ;
                          AllTrim( Str( aField[ DBS_DEC ] ) ) + ")" + fNotNull( aField, cPrimaryKey, cAuto ) + Eval( bDefault, aField ) + ","
-   
+
             ENDIF
             EXIT
-   
+
          CASE "D"
             cQuery += aField[ DBS_NAME ] + " date " + fNotNull( aField, cPrimaryKey, cAuto ) + Eval( bDefault, aField ) + ","
             EXIT
-   
+
          CASE "L"
             cQuery += aField[ DBS_NAME ] + " tinyint (1)" + fNotNull( aField, cPrimaryKey, cAuto ) + Eval( bDefault, aField ) + ","
             EXIT
-   
+
          CASE "B"
             cQuery += aField[ DBS_NAME ] + " mediumblob " + fNotNull( aField, cPrimaryKey, cAuto ) + Eval( bDefault, aField ) + ","
             EXIT
-   
+
          CASE "I"
             cQuery += aField[ DBS_NAME ] + " mediumint " + fNotNull( aField, cPrimaryKey, cAuto ) + Eval( bDefault, aField ) + ","
             EXIT
-   
+
          CASE "T"
             cQuery += aField[ DBS_NAME ] + " timestamp(" + AllTrim( Str( aField[ DBS_LEN ] ) ) + ")" + fNotNull( aField, cPrimaryKey, cAuto ) + Eval( bDefault, aField ) + ","
             EXIT
-   
+
    #ifdef __XHARBOUR__
          DEFAULT
    #else
          OTHERWISE
-   #endif            
+   #endif
             cQuery += aField[ DBS_NAME ] + " char(" + AllTrim(Str(aField[DBS_LEN])) + ")" + fNotNull( aField, cPrimaryKey, cAuto ) + Eval( bDefault, aField ) + ","
-   
+
          END
-   
+
       NEXT
-   
+
       IF ! Empty( cPrimarykey )
          cQuery += ' PRIMARY KEY (' + cPrimaryKey + '),'
       ENDIF
-   
+
       IF ::nInternalError == 0 .AND. ! Empty( cUniquekey )
          cQuery += ' UNIQUE ' + cUniquekey + ' (' + cUniqueKey + '),'
-      ENDIF     
+      ENDIF
    ENDIF
 
    // remove last comma from list
    IF nLenStruct > 0
       cQuery := Left( cQuery, Len( cQuery ) - 1 ) + ")" + cExtra + ";"
-   ELSE 
+   ELSE
       cQuery += cExtra + ";"
    ENDIF
 
-RETURN ::SqlQuery( cQuery ) 
+RETURN ::SqlQuery( cQuery )
 
 
 //----------------------------------------------------//
 
 METHOD DBCreate( cName, lIfNotExist, cCharSet, cCollate ) CLASS TDolphinSrv
 
-   LOCAL cQuery := "CREATE DATABASE" 
-   
+   LOCAL cQuery := "CREATE DATABASE"
+
    DEFAULT lIfNotExist TO .T.
-   
+
    IF lIfNotExist
       cQuery += " IF NOT EXISTS"
    ENDIF
-   
+
    cQuery += " " + D_LowerCase(  cName )
-   
+
    IF ! Empty( cCharSet )
       cQuery += " CHARACTER SET " + cCharSet
-   ENDIF 
-   
+   ENDIF
+
    IF ! Empty( cCollate )
       cQuery += " COLLATE  " + cCollate
-   ENDIF 
+   ENDIF
 
 RETURN ::SqlQuery( cQuery )
 
@@ -1235,40 +1235,40 @@ RETURN ::SqlQuery( cQuery )
 METHOD DeleteDB( cDB, lExists ) CLASS TDolphinSrv
 
    LOCAL cQuery := "DROP DATABASE "
-   
+
    DEFAULT lExists TO .F.
 
    cDB = D_LowerCase( cDB )
 
    IF lExists
       cQuery += " IF EXISTS "
-   ENDIF 
-   
+   ENDIF
+
    cQuery += cDB
 
-RETURN ::SqlQuery( cQuery ) 
-   
-//----------------------------------------------------//   
+RETURN ::SqlQuery( cQuery )
+
+//----------------------------------------------------//
 
 METHOD DeleteForeign( cName, cTable ) CLASS TDolphinSrv
-   LOCAL cQuery 
+   LOCAL cQuery
    LOCAL cEngine := Upper( ::GetEngine( cTable ) )
-   
+
    If cEngine != "INNODB"
       RETURN .F.
    EndIf
-   
+
    cQuery := "ALTER TABLE " + D_LowerCase( cTable ) + " DROP FOREIGN KEY " + cName
 
 RETURN ::SqlQuery( cQuery )
 
-//----------------------------------------------------//   
+//----------------------------------------------------//
 
 METHOD DeleteIndex( cName, cTable, lPrimary ) CLASS TDolphinSrv
 
-   LOCAL cQuery 
+   LOCAL cQuery
    DEFAULT lPrimary TO .F.
-   
+
    cQuery = "DROP INDEX" + If( lPrimary, " PRIMARY ", " " ) + cName + " ON " + D_LowerCase( cTable )
 
 RETURN ::SqlQuery( cQuery )
@@ -1277,25 +1277,25 @@ RETURN ::SqlQuery( cQuery )
 //----------------------------------------------------//
 
 METHOD DeleteTables( acTables, lExists ) CLASS TDolphinSrv
-   
-   LOCAL cTables 
+
+   LOCAL cTables
    LOCAL cQuery := "DROP TABLE "
-   
+
    DEFAULT lExists TO .F.
 
    IF ValType( acTables ) == "A"
        cTables = SqlStringFromArray( acTables )
-   ELSE 
+   ELSE
        cTables = D_LowerCase( acTables )
-   ENDIF 
+   ENDIF
 
    IF lExists
       cQuery += " IF EXISTS "
-   ENDIF 
-   
+   ENDIF
+
    cQuery += cTables
 
-RETURN ::SqlQuery( cQuery ) 
+RETURN ::SqlQuery( cQuery )
 
 
 //----------------------------------------------------//
@@ -1306,17 +1306,17 @@ METHOD End() CLASS TDolphinSrv
 
    IF ::hMysql != NIL
       AEval( ::aQueries, {| o | If( o != NIL, o:End(), ) } )
-      //MySqlClose( ::hMysql )/* NOTE: Deprecated */      
+      //MySqlClose( ::hMysql )/* NOTE: Deprecated */
       ::hMysql = NIL
    ENDIF
-   
+
    IF ::hMysql != NIL
-      nHost = AScan( aHost, { | a | Upper( a[ 2 ] ) == Upper( ::cNameHost ) } ) 
+      nHost = AScan( aHost, { | a | Upper( a[ 2 ] ) == Upper( ::cNameHost ) } )
       ADel( aHost, nHost )
       ASize( aHost, Len( aHost ) - 1 )
    ENDIF
-   
-   
+
+
 RETURN NIL
 
 //----------------------------------------------------//
@@ -1329,13 +1329,13 @@ METHOD ExecuteScript( cFile, bOnScrip ) CLASS TDolphinSrv
    IF Empty( cFile )
       cText  = D_ReadFile( cFile )
       aLine := hb_ATokens( cText, ";" )
-   
+
       ::MultiQuery( aLine, , bOnScrip )
 
-   ELSE 
-   
+   ELSE
+
       ::Execute( cFile )
-      
+
    ENDIF
 
 //#ifndef NOINTERNAL
@@ -1344,9 +1344,9 @@ METHOD ExecuteScript( cFile, bOnScrip ) CLASS TDolphinSrv
 //      ::CheckError()
 //      RETURN .F.
 //   ENDIF
-//#endif 
+//#endif
 
-   
+
 
 
 RETURN NIL
@@ -1364,17 +1364,17 @@ METHOD GetAutoIncrement( cTable ) CLASS TDolphinSrv
    IF Empty( cTable )
       RETURN( nId )
    ENDIF
-   
+
    IF !Empty( ::cDBName )
       cOldDB = ::cDBName
 #ifndef NOINTERNAL
-   ELSE 
+   ELSE
       ::nInternalError = ERR_NODATABASESELECTED
       ::CheckError()
       RETURN nId
-#endif       
+#endif
    ENDIF
-      
+
    ::SelectDB( "information_schema" )
 
    cQuery := "SELECT auto_increment "
@@ -1390,7 +1390,7 @@ METHOD GetAutoIncrement( cTable ) CLASS TDolphinSrv
    ENDIF
 
    ::SelectDB( cOldDB )
-   
+
    oQuery:End()
    oQuery := NIL
 
@@ -1401,26 +1401,26 @@ RETURN nId
 METHOD GetEngine( cTable, cSchema ) CLASS TDolphinSrv
 
    LOCAL oQuery, cQuery, cEngine
-   
+
    DEFAULT cSchema TO ::cDBName
-   
+
    IF Empty( cTable )
       RETURN ""
    ENDIF
-   
+
    IF ( "." $ cTable )
       cTable := ATAIL( hb_aTokens( cTable, "." ) )
    ENDIF
-   
+
    cQuery := "SELECT ENGINE FROM information_schema.TABLES WHERE "
    cQuery += "TABLE_SCHEMA = '" + D_LowerCase( cSchema ) + "' AND "
    cQuery += "TABLE_NAME = '" + D_LowerCase( cTable ) +"'"
-   
+
    oQuery := ::Query( cQuery )
    IF oQuery:LastRec() > 0
       cEngine := oQuery:FieldGet( 1 )
    ENDIF
-   
+
    oQuery:End()
    oQuery := NIL
 
@@ -1430,35 +1430,35 @@ RETURN AllTrim( cEngine )
 
 METHOD GetPrivileges( nType ) CLASS TDolphinSrv
 
-   LOCAL oQry 
+   LOCAL oQry
    LOCAL cQuery := "SHOW PRIVILEGES"
    LOCAL aPrivilegs := {}
    LOCAL cPriv, lAdd := .F.
-   
+
    DEFAULT nType TO PRIV_DATA
-   
+
    oQry = ::Query( cQuery )
-   
-   WHILE ! oQry:Eof() 
-      
+
+   WHILE ! oQry:Eof()
+
       SWITCH nType
          CASE PRIV_ADMIN
             IF "ADMIN" $ Upper( oQry:CONTEXT )
                lAdd = .T.
-            ENDIF 
-            EXIT 
+            ENDIF
+            EXIT
          CASE PRIV_DATA
             IF !( "SERVER" $ Upper( oQry:CONTEXT ) )
                lAdd = .T.
-            ENDIF 
-            EXIT 
+            ENDIF
+            EXIT
          CASE PRIV_TABLE
             IF "TABLE" $ Upper( oQry:CONTEXT )
                lAdd = .T.
-            ENDIF 
-            EXIT 
-            
-        CASE PRIV_ALL 
+            ENDIF
+            EXIT
+
+        CASE PRIV_ALL
            lAdd = .T.
      ENDSWITCH
      IF lAdd
@@ -1475,7 +1475,7 @@ RETURN aPrivilegs
 METHOD GetQueryId() CLASS TDolphinSrv
 
    DEFAULT ::nQueryId TO 0
-   
+
    ::nQueryId++
 
 RETURN ::nQueryId
@@ -1485,14 +1485,14 @@ RETURN ::nQueryId
 METHOD GetRowsFromTable( cTable ) CLASS TDolphinSrv
    LOCAL nTotal := 0
    LOCAL oQry
-   
+
    oQry = ::Query( "SELECT COUNT(*) FROM " + D_LowerCase( cTable ) )
-   
+
    nTotal = oQry:FieldGet( 1 )
-   
-   oQry:End() 
-   
-RETURN nTotal 
+
+   oQry:End()
+
+RETURN nTotal
 
 
 //----------------------------------------------------//
@@ -1503,37 +1503,37 @@ METHOD GetRowsFromQry( oQry ) CLASS TDolphinSrv
    LOCAL aOldColumns
    LOCAL cQuery
    LOCAL oQryAux
-   
-#ifndef NOINTERNAL   
+
+#ifndef NOINTERNAL
    IF ! oQry != NIL .AND. oQry:IsKindOf( "TDOLPHINQRY" )
       ::nInternalError = ERR_MISSINGQRYOBJECT
       ::CheckError()
-      RETURN nTotal 
+      RETURN nTotal
    ENDIF
-#endif 
+#endif
 
    aOldColumns = AClone( oQry:aColumns )
-   
-   
+
+
    cQuery := BuildQuery( { "COUNT(*)" }, ;
                           oQry:aTables, ;
                           oQry:cWhere, ;
                           oQry:cGroup, ;
                           oQry:cHaving )
-   
+
    oQry:BuildQuery( aOldColumns, ;
                     oQry:aTables,;
                     oQry:cWhere, ;
                     oQry:cGroup, ;
-                    oQry:cHaving,; 
+                    oQry:cHaving,;
                     oQry:cOrder, ;
                     oQry:cLimit )
-   
+
    oQryAux = ::Query( cQuery )
-   
+
    nTotal  = oQryAux:FieldGet( 1 )
-   
-   oQryAux:End()   
+
+   oQryAux:End()
 
 RETURN nTotal
 
@@ -1541,15 +1541,15 @@ RETURN nTotal
 
 METHOD hInsert( cTable, hValues, cDuplicateKey ) CLASS TDolphinSrv
 
-   local lRet := .F. 
+   local lRet := .F.
    local aValues := {}
    local aColumns := HGetKeys( hValues )
    local n
-   
+
    for n = 1 to Len( aColumns )
       AAdd( aValues, hValues[ aColumns[ n ] ] )
-   next 
-   
+   next
+
    lRet := ::Insert( cTable, aColumns, aValues, cDuplicateKey )
 
 
@@ -1562,41 +1562,41 @@ METHOD Insert( cTable, aColumns, aValues, cDuplicateKey ) CLASS TDolphinSrv
    LOCAL cExecute
    LOCAL lRet, n
    LOCAL lMulti := .F.
-   
+
    aColumns = CheckArray( aColumns )
-   
-  lMulti := ValType( aValues ) == 'A' .and. ValType( aValues[ 1 ] ) == 'A'      
+
+  lMulti := ValType( aValues ) == 'A' .and. ValType( aValues[ 1 ] ) == 'A'
 
 #ifndef NOINTERNAL
-   IF Empty( aColumns ) .AND. Empty( aValues ) 
+   IF Empty( aColumns ) .AND. Empty( aValues )
       ::nInternalError = ERR_EMPTYVALUES
       ::CheckError()
       RETURN .F.
-   ENDIF    
-   
-   IF Empty( cTable ) 
+   ENDIF
+
+   IF Empty( cTable )
       ::nInternalError = ERR_EMPTYTABLE
       ::CheckError()
-      RETURN .F. 
-   ENDIF 
-   
-   IF lMulti    
+      RETURN .F.
+   ENDIF
+
+   IF lMulti
       n = Len( aValues[ 1 ] )
    ELSE
       n = Len( aValues )
    ENDIF
-   
+
    IF Len( aColumns ) # n
       ::nInternalError = ERR_NOMATCHCOLUMNSVALUES
       ::CheckError()
-      RETURN .F. 
-   ENDIF 
-   
-#endif 
+      RETURN .F.
+   ENDIF
+
+#endif
 
    cExecute = BuildInsert( cTable, aColumns, aValues, , lMulti, cDuplicateKey )
-   lRet = ::SqlQuery( cExecute )  
-  
+   lRet = ::SqlQuery( cExecute )
+
 RETURN lRet
 
 //----------------------------------------------------//
@@ -1613,65 +1613,65 @@ METHOD InsertFromDbf( cTable, cAlias, nLimit, aStruct, bOnInsert, cDuplicateKey,
    LOCAL uValue
    LOCAL dbs, aDbs := {}
    LOCAL hHash := {=>}
-   
+
    DEFAULT nLimit TO 500
 
 #ifndef NOINTERNAL
-   
-   IF Empty( cTable ) 
+
+   IF Empty( cTable )
       ::nInternalError = ERR_EMPTYTABLE
       ::CheckError()
-      RETURN .F. 
-   ENDIF 
-   
-   
-   IF Empty( cAlias ) 
+      RETURN .F.
+   ENDIF
+
+
+   IF Empty( cAlias )
       ::nInternalError = ERR_EMPTYALIAS
       ::CheckError()
-      RETURN .F. 
-   ENDIF 
-   
+      RETURN .F.
+   ENDIF
 
-#endif 
-   
+
+#endif
+
    dbs = ( cAlias )->( DBStruct() )
-   
-   FOR EACH aItem IN dbs 
+
+   FOR EACH aItem IN dbs
       AAdd( aDbs, aItem[ DBS_NAME ] )
    NEXT
-   
+
    DEFAULT aStruct TO aDbs
 
    aStruct := CheckArray( aStruct )
-   
+
    aStructTable = ::TableStructure( cTable )
-   
+
    FOR EACH aItem IN aStruct
       IF AScan( aStructTable, {| a | Upper( a[ DBS_NAME ] ) == Upper( aItem ) } ) == 0
 #ifndef NOINTERNAL
          ::nInternalError = ERR_NOMATCHCOLUMNSALIAS
          ::CheckError()
-         RETURN .F.      
-#endif 
+         RETURN .F.
+#endif
       ENDIF
 //      AAdd( aColumns, aItem[ DBS_NAME ] )
       cColumns += aItem  + ","
    NEXT
 
 
-   
+
    cColumns = SubStr( cColumns, 1, Len( cColumns ) - 1 ) + ") VALUES"
    DO WHILE ! ( cAlias )->( eof() )
       cValues += "("
-      FOR EACH aItem IN aStruct      
-         uValue = ( cAlias )->( FieldGet( FieldPos( aItem ) ) ) 
+      FOR EACH aItem IN aStruct
+         uValue = ( cAlias )->( FieldGet( FieldPos( aItem ) ) )
          IF ValType( uValue ) == "C"
-            uValue = Val2Escape( uValue ) 
+            uValue = Val2Escape( uValue )
          ENDIF
          hHash[ aItem ] = uValue
          cValues_temp += ClipValue2SQL( uValue ) + ","
       NEXT
-      IF bOnRow != NIL 
+      IF bOnRow != NIL
         cValues_temp = ""
         Eval( bOnRow, hHash )
         FOR EACH aItem IN aStruct
@@ -1685,30 +1685,30 @@ METHOD InsertFromDbf( cTable, cAlias, nLimit, aStruct, bOnInsert, cDuplicateKey,
       ( cAlias )->( DBSkip() )
       n++
       IF n > nLimit
-         //Delete last coma       
-         if bOnInsert != NIL 
-            Eval( bOnInsert )   
+         //Delete last coma
+         if bOnInsert != NIL
+            Eval( bOnInsert )
          endif
-         cValues  = SubStr( cValues, 1, Len( cValues ) - 1 )  
-         cExecute = "INSERT INTO " + D_LowerCase( cTable ) + " ( " + cColumns + cValues   
+         cValues  = SubStr( cValues, 1, Len( cValues ) - 1 )
+         cExecute = "INSERT INTO " + D_LowerCase( cTable ) + " ( " + cColumns + cValues
          if cDuplicateKey != NIL
             cExecute += " ON DUPLICATE KEY UPDATE " + cDuplicateKey
-         endif         
-         lRet = ::SqlQuery( cExecute )        
+         endif
+         lRet = ::SqlQuery( cExecute )
          n = 1
          cValues = ""
       ENDIF
    ENDDO
-   
+
    IF n <= nLimit .AND. n > 1
-      cValues  = SubStr( cValues, 1, Len( cValues ) - 1 )  
-      cExecute = "INSERT INTO " + D_LowerCase( cTable ) + " ( " + cColumns + cValues     
+      cValues  = SubStr( cValues, 1, Len( cValues ) - 1 )
+      cExecute = "INSERT INTO " + D_LowerCase( cTable ) + " ( " + cColumns + cValues
       if cDuplicateKey != NIL
          cExecute += " ON DUPLICATE KEY UPDATE " + cDuplicateKey
-      endif      
-      lRet = ::SqlQuery( cExecute )  
+      endif
+      lRet = ::SqlQuery( cExecute )
    ENDIF
-  
+
 RETURN lRet
 
 //----------------------------------------------------//
@@ -1761,25 +1761,25 @@ METHOD IsAutoIncrement( cField, cTable ) CLASS TDolphinSrv
 
    LOCAL lAuto := .F.
    LOCAL aStruct
-   LOCAL hRes 
+   LOCAL hRes
 
    cField = D_LowerCase( cField )
    cTable = D_LowerCase( cTable )
 
 
    hRes = MySqlListFields( ::hMysql, cTable, cField )
-   
+
    IF hRes == NIL
-      ::CheckError() 
-   ELSE   
-      aStruct = MySqlResultStructure( hRes, D_SetCaseSensitive(), D_LogicalValue() ) 
+      ::CheckError()
+   ELSE
+      aStruct = MySqlResultStructure( hRes, D_SetCaseSensitive(), D_LogicalValue() )
       //MySqlFreeResult( hRes )/* NOTE: Deprecated */
       lAuto = IS_AUTO_INCREMENT( aStruct[ 1, MYSQL_FS_FLAGS ] )
    ENDIF
-   
+
    hRes = NIL
-   
-RETURN lAuto 
+
+RETURN lAuto
 
 //----------------------------------------------------//
 
@@ -1791,7 +1791,7 @@ METHOD LastDownData( cTable, cCol, uDef ) CLASS TDolphinSrv
 
    DEFAULT cTable TO ""
    DEFAULT cCol   TO ""
-   
+
 
    IF ! Empty( cTable ) .AND. ! Empty( cCol )
       cQuery := "SELECT " + D_LowerCase( cCol ) + " "
@@ -1813,26 +1813,26 @@ RETURN xData
 METHOD LastInsertID() CLASS TDolphinSrv
    LOCAL oQry
    LOCAL nLast
-   
+
    oQry = ::Query( "SELECT LAST_INSERT_ID() AS last" )
-   nlast = oQry:Last 
+   nlast = oQry:Last
    oQry:End()
-   
+
 RETURN nlast
 
 //----------------------------------------------------//
 
 METHOD ListDBs( cWild ) CLASS TDolphinSrv
    LOCAL aList
-   aList = MySqlListDBs( ::hMysql, cWild ) 
+   aList = MySqlListDBs( ::hMysql, cWild )
    ::CheckError()
-   
+
 RETURN aList
 
 
 //----------------------------------------------------//
 
-   
+
 METHOD ListTables( cWild ) CLASS TDolphinSrv
    LOCAL aList
 
@@ -1850,15 +1850,15 @@ METHOD MultiQuery( aQueries, lTransaction, bOnMultiQry ) CLASS TDolphinSrv
    LOCAL cLast
    LOCAL nIdx
    LOCAL nTotal
-   
+
 
    DEFAULT lTransaction TO .T.
    DEFAULT bOnMultiQry  TO ::bOnMultiQry
-   
+
    ::bOnMultiQry = bOnMultiQry
 
 #ifndef NOINTERNAL
-   IF Empty( aQueries ) 
+   IF Empty( aQueries )
       ::nInternalError = ERR_INVALIDQUERYARRAY
       ::CheckError()
       RETURN .F.
@@ -1869,50 +1869,50 @@ METHOD MultiQuery( aQueries, lTransaction, bOnMultiQry ) CLASS TDolphinSrv
       IF lTransaction
          ::BeginTransaction()
       ENDIF
-      
+
       nTotal = Len( aQueries ) - 1
       FOR EACH cQuery IN aQueries
          cLast = cQuery
          //cQuery = StrTran( cQuery, CRLF, "" )
          IF ! Empty( cQuery )
             ::SqlQuery( cQuery )
-            
+
             IF ::bOnMultiQry != NIL
-#ifdef __XHARBOUR__             
+#ifdef __XHARBOUR__
                nIdx = HB_EnumIndex()
-#else 
+#else
                nIdx = cQuery:__EnumIndex()
-#endif 
+#endif
                Eval( ::bOnMultiQry, nIdx, nTotal )
-            
+
             ENDIF
          ENDIF
       NEXT
-      
+
       IF lTransaction
          ::CommitTransaction()
       ENDIF
-   
+
    CATCH oError
       MySqlRollBack( ::hMysql )
       ::RollBack()
-#ifndef NOINTERNAL      
+#ifndef NOINTERNAL
       ::nInternalError = ERR_MULTIQUERYFAULIRE
       ::CheckError( , cLast)
       RETURN .F.
-#endif       
-   END 
+#endif
+   END
 
 RETURN .T.
 
 //---------------------------------------------//
 
-METHOD Query( cQuery, uValues )   
-   
+METHOD Query( cQuery, uValues )
+
    local oQry
- 
+
    oQry = TDolphinQry():New( cQuery, Self, uValues )
-   
+
 RETURN oQry
 
 
@@ -1921,10 +1921,10 @@ RETURN oQry
 METHOD ReConnect() CLASS TDolphinSrv
 
    LOCAL oQrs
-      
+
    ::hMysql = ::Connect()
    FOR EACH oQrs IN ::aQueries
-      oQrs:oServer = Self 
+      oQrs:oServer = Self
       oQrs:Refresh()
    NEXT
 
@@ -1933,14 +1933,14 @@ RETURN NIL
 //---------------------------------------------//
 
 
-METHOD RenameUser( cFromUser, cServer, cRename )  
+METHOD RenameUser( cFromUser, cServer, cRename )
 
    LOCAL cQry := ""
 
-   cQry += "RENAME USER " 
+   cQry += "RENAME USER "
    cQry += D_LowerCase( ClipValue2SQL( cFromUser ) )
    cQry += "@" + D_LowerCase( ClipValue2SQL( cServer ) )
-   cQry += " TO " 
+   cQry += " TO "
    cQry += D_LowerCase( ClipValue2SQL( cRename ) )
    cQry += "@" + D_LowerCase( ClipValue2SQL( cServer ) )
 
@@ -1961,57 +1961,57 @@ METHOD Restore( cFile, lCancel, bOnRestore ) CLASS TDolphinSrv
    LOCAL nCurLine := 0
    LOCAL nTotLine := 0
    LOCAL nIdx
-   
+
    DEFAULT lCancel TO .F.
-   
+
    DEFAULT bOnRestore TO ::bOnRestore
-   
+
    ::bOnRestore = bOnRestore
-   
+
 #ifndef NOINTERNAL
    IF ! File( cFile )
       ::nInternalError = ERR_INVALIDBACKUPFILE
       ::CheckError()
       RETURN .F.
    ENDIF
-#endif 
-   
-   IF ::bOnRestore != NIL 
+#endif
+
+   IF ::bOnRestore != NIL
       Eval( ::bOnRestore, ST_STARTRESTORE )
    ENDIF
 
    cText  = D_ReadFile( cFile )
 
    aLine := hb_ATokens( cText, CRLF )
-   
+
    IF ! lCancel
       nTotLine = Len( aLine )
       FOR EACH cLine IN aLine
-      
+
          IF lCancel
             EXIT
          ENDIF
-#ifdef __XHARBOUR__             
+#ifdef __XHARBOUR__
          nIdx = HB_EnumIndex()
-#else 
+#else
          nIdx = cLine:__EnumIndex()
-#endif                 
+#endif
          IF ::bOnRestore != NIL
             Eval( ::bOnRestore, ST_RESTORING, cTable, nTotLine, nIdx )
          ENDIF
 
-         IF "CREATE DATABASE IF NOT EXISTS" $ cLine 
+         IF "CREATE DATABASE IF NOT EXISTS" $ cLine
             ::SqlQuery( cLine )
             ::SelectDB( SubStr( cLine, RAt( " ", cLine ) + 1 ) )
             LOOP
          ENDIF
-         IF "** BEGIN" $ cLine 
-            cTable = SubStr( cLine, 9, Len( cLine ) - 9 ) 
+         IF "** BEGIN" $ cLine
+            cTable = SubStr( cLine, 9, Len( cLine ) - 9 )
          ENDIF
          IF Right( cLine, 1 ) == ";"
             cLine = SubStr( cLine, 1, Len( cLine ) - 1 )
          ENDIF
-         
+
          IF "DROP TABLE" $ cLine
             ::SqlQuery( cLine )
          ENDIF
@@ -2031,11 +2031,11 @@ METHOD Restore( cFile, lCancel, bOnRestore ) CLASS TDolphinSrv
       NEXT
 
    ENDIF
-   
+
    IF ::bOnRestore != NIL
       Eval( ::bOnRestore, IIf( lCancel, ST_RSTCANCEL, ST_ENDRESTORE ) )
    ENDIF
-   
+
 
 RETURN ! lCancel
 
@@ -2059,10 +2059,10 @@ METHOD RevokePrivileges( cHost, cUser, cDB, acPrivilegs ) CLASS TDolphinSrv
 
    cHost     := Alltrim( cHost )
    cUser     := Alltrim( cUser )
-   
+
    IF ValType( acPrivilegs ) == "A"
       cPriv = SQLStringFromArray( acPrivilegs )
-   ELSE 
+   ELSE
       cPriv = acPrivilegs
    ENDIF
 
@@ -2075,8 +2075,8 @@ RETURN ::SqlQuery( cQuery )
 
 METHOD SelectDB( cDBName ) CLASS TDolphinSrv
 
-   LOCAL nError 
-   
+   LOCAL nError
+
    ::lError := .F.
 
 #ifndef NOINTERNAL
@@ -2087,7 +2087,7 @@ METHOD SelectDB( cDBName ) CLASS TDolphinSrv
    ENDIF
 #endif
    cDBName = AllTRim( cDBName )
-   
+
    IF ( MysqlSelectDB( ::hMysql, cDBName ) ) != 0   // table not exist
       ::cDBName :=""
       ::lError  := .T.
@@ -2109,7 +2109,7 @@ METHOD SelectTable( aColumns, aTables, cWhere, cGroup, cHaving, cOrder, cLimit, 
    LOCAL cColumns, cTables
    LOCAL cQuery
 
-   cQuery := BuildQuery( aColumns, aTables, cWhere, cGroup, cHaving, cOrder, cLimit, ,lWithRoll ) 
+   cQuery := BuildQuery( aColumns, aTables, cWhere, cGroup, cHaving, cOrder, cLimit, ,lWithRoll )
 
    oQuery = ::Query( cQuery )
 
@@ -2119,11 +2119,11 @@ RETURN oQuery
 
 METHOD SetNameServer( cName ) CLASS TDolphinSrv
 
-   LOCAL nHost 
-   
-   nHost = AScan( aHost, {| a | Upper( a[ 2 ] ) == Upper( ::cNameHost ) } )   
-   
-   IF nHost > 0 
+   LOCAL nHost
+
+   nHost = AScan( aHost, {| a | Upper( a[ 2 ] ) == Upper( ::cNameHost ) } )
+
+   IF nHost > 0
       aHost[ nHost ][ 2 ] = cName
       ::cNameHost = cName
    ENDIF
@@ -2136,25 +2136,25 @@ METHOD SQLQuery( cQuery, uParams ) CLASS TDolphinSrv
 
    LOCAL nLen := If( ! Empty( cQuery ), Len( cQuery ), 0 )
    LOCAL nRet
-      
+
    IF nLen > 0
 #ifdef DEBUG
       ::Debug( cQuery )
-#endif   
+#endif
       cQuery = TransformQueryParams( cQuery, uParams )
       IF ( nRet := MySqlQuery( ::hMysql, cQuery, nLen ) ) > 0
-         ::CheckError()      
+         ::CheckError()
       ENDIF
       IF ::bonAfterQuery != NIL
          Eval( ::bonAfterQuery, Self, cQuery )
-      ENDIF            
-      
-#ifndef NOINTERNAL      
-   ELSE 
+      ENDIF
+
+#ifndef NOINTERNAL
+   ELSE
       ::nInternalError = ERR_NOQUERY
       ::CheckError()
       nRet = ::nInternalError
-#endif       
+#endif
    ENDIF
 
 RETURN nRet == 0
@@ -2168,81 +2168,81 @@ METHOD TableInitValues( cTable ) CLASS TDolphinSrv
    local hRow
    local uItem
    local uValue, cType, nPad
-   
+
 #ifndef NOINTERNAL
    IF ! ::TableExist( cTable )
       ::oServer:nInternalError = ERR_TABLENOEXIST
       ::oServer:CheckError()
-      RETURN NIL 
+      RETURN NIL
    ENDIF
-#endif 
+#endif
 
    aStructure = ::TableStructure( cTable )
-   
+
    hRow = Hash()
-   
+
    FOR EACH uItem IN aStructure
 
       cType := uItem[ MYSQL_FS_CLIP_TYPE ]
       SWITCH cType
-      
+
       CASE "M"
          // we can not use PadR in  memo field
          IF uItem[ MYSQL_FS_DEF ] != NIL
             uValue = uItem[ MYSQL_FS_DEF ]
-         ELSE 
+         ELSE
             uValue = ""
-         ENDIF 
-         EXIT         
+         ENDIF
+         EXIT
       CASE "C"
          IF D_SetPadRight()
             nPad = Min( If( uItem[ MYSQL_FS_MAXLEN ] > uItem[ MYSQL_FS_LENGTH ],;
                       uItem[ MYSQL_FS_MAXLEN ], uItem[ MYSQL_FS_LENGTH] ), MAX_BLOCKSIZE )
-         ELSE 
-            nPad = 0 
+         ELSE
+            nPad = 0
          ENDIF
          IF uItem[ MYSQL_FS_DEF ] != NIL
             uValue = PadR( uItem[ MYSQL_FS_DEF ], Max( Len( uItem[ MYSQL_FS_DEF ] ), nPad ) )
-         ELSE 
+         ELSE
             uValue = Space( nPad )
-         ENDIF 
+         ENDIF
          EXIT
 
       CASE "N"
       CASE "I"
          IF uItem[ MYSQL_FS_DEF ] != NIL
             uValue = Val( uItem[ MYSQL_FS_DEF ] )
-         ELSE 
+         ELSE
             uValue = 0
-         ENDIF 
+         ENDIF
          EXIT
 
       CASE "L"
          IF uItem[ MYSQL_FS_DEF ] != NIL
             uValue = uItem[ MYSQL_FS_DEF ] == "1"
-         ELSE 
+         ELSE
             uValue = .F.
-         ENDIF 
-         
+         ENDIF
+
          EXIT
 
       CASE "D"
          IF uItem[ MYSQL_FS_DEF ] != NIL
             uValue = SqlDate2Clip( uItem[ MYSQL_FS_DEF ] )
-         ELSE 
+         ELSE
             uValue = CToD("")
-         ENDIF 
-      
+         ENDIF
+
          EXIT
 
 #ifdef __XHARBOUR__
       DEFAULT
-#else 
+#else
       OTHERWISE
 #endif
          uValue := nil
       END
-      
+
       HSet( hRow, Lower( uItem[ MYSQL_FS_NAME ] ) , uValue )
 
    NEXT
@@ -2255,44 +2255,44 @@ METHOD TableStructure( cTable )  CLASS TDolphinSrv
 
    LOCAL aStruct := {}
    LOCAL n
-   LOCAL hRes 
+   LOCAL hRes
 
 
    hRes = MySqlListFields( ::hMysql, cTable )
-   
+
    IF hRes == NIL
-      ::CheckError() 
+      ::CheckError()
    ELSE
-      aStruct = MySqlResultStructure( hRes, D_SetCaseSensitive(), D_LogicalValue() ) 
+      aStruct = MySqlResultStructure( hRes, D_SetCaseSensitive(), D_LogicalValue() )
       //MySqlFreeResult( hRes ) /* NOTE: Deprecated */
-      hRes = NIL      
+      hRes = NIL
       IF Len( aStruct ) == 0
          ::CheckError()
       ENDIF
    ENDIF
-   
+
 RETURN aStruct
-   
-//----------------------------------------------------//   
+
+//----------------------------------------------------//
 
 METHOD hUpdate( cTable, hValues, cWhere ) CLASS TDolphinSrv
 
-   local lRet := .F. 
+   local lRet := .F.
    local aValues := {}
    local aColumns := HGetKeys( hValues )
    local n
-   
+
    for n = 1 to Len( aColumns )
       AAdd( aValues, hValues[ aColumns[ n ] ] )
-   next 
-   
+   next
+
    lRet := ::Update( cTable, aColumns, aValues, cWhere )
 
 
 RETURN lRet
 
-//----------------------------------------------------//   
-   
+//----------------------------------------------------//
+
 METHOD Update( cTable, aColumns, aValues, cWhere ) CLASS TDolphinSrv
 
    LOCAL cExecute
@@ -2300,79 +2300,79 @@ METHOD Update( cTable, aColumns, aValues, cWhere ) CLASS TDolphinSrv
    LOCAL aStruc, nPos
    LOCAL cValue, cField
    LOCAL lError := .F.
-   
+
    DEFAULT cWhere       TO ""
-   
+
    aColumns = CheckArray( aColumns )
    aValues  = CheckArray( aValues )
    aStruc   = ::TableStructure( cTable )
 
 
-#ifndef NOINTERNAL   
+#ifndef NOINTERNAL
    IF Empty( aColumns ) .OR. Empty( aValues )
       ::nInternalError = ERR_EMPTYVALUES
       ::CheckError()
-      RETURN .F. 
-   ENDIF 
-      
-   IF Empty( cTable ) 
+      RETURN .F.
+   ENDIF
+
+   IF Empty( cTable )
       ::nInternalError = ERR_EMPTYTABLE
       ::CheckError()
-      RETURN .F. 
-   ENDIF 
-   
+      RETURN .F.
+   ENDIF
+
    IF Len( aColumns ) # Len( aValues )
       ::nInternalError = ERR_NOMATCHCOLUMNSVALUES
       ::CheckError()
-      RETURN .F. 
-   ENDIF 
-  
-#endif    
+      RETURN .F.
+   ENDIF
+
+#endif
    cExecute := "UPDATE " + D_LowerCase( cTable ) + " SET "
    FOR EACH cField IN aColumns
 #ifdef __XHARBOUR__
             n = HB_EnumIndex()
-#else                      
-            n = cField:__EnumIndex() 
-#endif 
+#else
+            n = cField:__EnumIndex()
+#endif
       nPos = AScan( aStruc, {| aRow | Lower( AllTrim( aRow[ MYSQL_FS_NAME ] ) )  == Lower( cField ) } )
-#ifndef NOINTERNAL         
+#ifndef NOINTERNAL
       IF nPos == 0
          ::nInternalError = ERR_INVALIDFIELDNAME
          ::CheckError()
          RETURN .F.
       ENDIF
-#endif      
-      IF HB_IsArray( aValues[ n ] ) 
+#endif
+      IF HB_IsArray( aValues[ n ] )
          cValue   = ClipValue2SQL( aValues[ n ][ 1 ], aStruc[ nPos ][ MYSQL_FS_CLIP_TYPE ] )
          IF aStruc[ nPos ][ MYSQL_FS_CLIP_TYPE ] == "M"
             cExecute += cField + " = CONCAT(" + cField + ", " + cValue + "),"
          ELSE
             cExecute += cField + " = " + cField + " + " + cValue + ","
-         ENDIF         
-      ELSE 
+         ENDIF
+      ELSE
          cValue   = ClipValue2SQL( aValues[ n ], aStruc[ nPos ][ MYSQL_FS_CLIP_TYPE ] )
          cExecute += cField + " = " + cValue + ","
       ENDIF
 
-   NEXT 
-   
+   NEXT
+
    IF ! lError
-      //Delete last comma 
+      //Delete last comma
       cExecute = SubStr( cExecute, 1, Len( cExecute ) - 1 )
       IF !Empty( cWhere )
          cExecute += " WHERE " + cWhere
       ENDIF
-      lRet = ::SqlQuery( cExecute )   
-   ELSE 
+      lRet = ::SqlQuery( cExecute )
+   ELSE
       lRet = .F.
       ::lError = lError
       ::CheckError()
    ENDIF
 
 
-RETURN lRet   
-   
+RETURN lRet
+
 //----------------------------------------------------//
 //----------------------------------------------------//
 //----------------------------------------------------//
@@ -2382,8 +2382,8 @@ FUNCTION ClipValue2SQL( Value, cType, lTxt, lNoNull ) // Compatibility wint TMys
 
 
    LOCAL cValue := ""
-   LOCAL cTxt   
-   
+   LOCAL cTxt
+
    DEFAULT lTxt TO .T.
    DEFAULT cType TO ValType( Value )
    DEFAULT lNoNull TO .F.
@@ -2447,7 +2447,7 @@ FUNCTION ClipValue2SQL( Value, cType, lTxt, lNoNull ) // Compatibility wint TMys
 
 #ifdef __XHARBOUR__
       DEFAULT
-#else 
+#else
       OTHERWISE
 #endif
          cValue := "" + cTxt + cTxt + ""
@@ -2464,46 +2464,46 @@ RETURN  SToD( Left( cField, 4 ) + substr( cField, 6, 2 ) + right( cField, 2 ) )
 //----------------------------------------------------//
 // Return string from array separated with ","
 FUNCTION SqlStringFromArray( aArray )
-   
+
    LOCAL cItem, cString := ""
-   
+
 
    FOR EACH cItem IN aArray
       cString += D_LowerCase( cItem ) + ", "
    NEXT
-   
+
    cString = Left( cString, Len( cString ) - 2 )
-   
+
 RETURN cString
 
 //----------------------------------------------------//
 
 STATIC FUNCTION VerifyStructure( aStruct )
-   
-   LOCAL aRow 
+
+   LOCAL aRow
    LOCAL nError
-   
+
    FOR EACH aRow IN aStruct
-      IF Len( aRow ) < DBS_DEFAULT 
+      IF Len( aRow ) < DBS_DEFAULT
          nError = ERR_INVALID_STRUCT_ROW_SIZE
-         EXIT 
+         EXIT
       ENDIF
-      IF ValType( aRow[ DBS_NOTNULL ] ) != "U" .AND. ValType( aRow[ DBS_NOTNULL ] ) != "L"  
+      IF ValType( aRow[ DBS_NOTNULL ] ) != "U" .AND. ValType( aRow[ DBS_NOTNULL ] ) != "L"
          nError = ERR_INVALID_STRUCT_NOTNULL_VALUE
-         EXIT 
+         EXIT
       ENDIF
-   NEXT 
+   NEXT
 
 RETURN nError
-         
-//----------------------------------------------------//         
 
-STATIC FUNCTION fNotNull( aField, cPrimaryKey, cAuto )         
+//----------------------------------------------------//
+
+STATIC FUNCTION fNotNull( aField, cPrimaryKey, cAuto )
    LOCAL cRet := ""
-   
+
    IF ValType( aField[ DBS_NOTNULL ] ) == "L" .AND. aField[ DBS_NOTNULL ]
       cRet = " NOT NULL "
-   ELSE 
+   ELSE
       IF D_LowerCase( aField[ DBS_NAME ] ) == cPrimaryKey .OR. D_LowerCase( aField[ DBS_NAME ] ) == cAuto
          cRet = " NOT NULL "
       ENDIF
@@ -2511,22 +2511,22 @@ STATIC FUNCTION fNotNull( aField, cPrimaryKey, cAuto )
 
 RETURN cRet
 
-//----------------------------------------------------//         
+//----------------------------------------------------//
 
 FUNCTION ArrayFromSqlString( cString )
-   
+
    LOCAL aArray
-   
+
    aArray := HB_ATokens( cString, "," )
-   
+
 RETURN aArray
 
-//----------------------------------------------------//         
+//----------------------------------------------------//
 
 FUNCTION BuildQuery( aColumns, aTables, cWhere, cGroup, cHaving, cOrder, cLimit, lWithRoll )
    LOCAL cQuery := ""
    LOCAL cColumns
-   
+
    DEFAULT cWhere   TO ""
    DEFAULT cGroup   TO ""
    DEFAULT cHaving  TO ""
@@ -2538,7 +2538,7 @@ FUNCTION BuildQuery( aColumns, aTables, cWhere, cGroup, cHaving, cOrder, cLimit,
 
 
    cColumns = SQLStringFromArray( aColumns )
-   
+
    IF Empty( cColumns )
       cColumns = "*"
    ENDIF
@@ -2549,7 +2549,7 @@ FUNCTION BuildQuery( aColumns, aTables, cWhere, cGroup, cHaving, cOrder, cLimit,
       cQuery += " FROM "
       cQuery += SQLStringFromArray( aTables )
    ENDIF
-   
+
    IF !Empty( cWhere )
       cQuery += " WHERE "
       cQuery += cWhere
@@ -2576,94 +2576,94 @@ FUNCTION BuildQuery( aColumns, aTables, cWhere, cGroup, cHaving, cOrder, cLimit,
 
 RETURN cQuery
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
-FUNCTION BuildInsert( cTable, aColumns, aValues, lForceValue, lMulti, cDuplicateKey  )  
+FUNCTION BuildInsert( cTable, aColumns, aValues, lForceValue, lMulti, cDuplicateKey  )
 
    LOCAL cExecute
    LOCAL cValues  := ""
    LOCAL cColumns := ""
    LOCAL uValue
    LOCAL n, aRow, uData
-   
+
    DEFAULT lForceValue TO .F.
    DEFAULT lMulti TO .F.
-   
+
    IF lMulti
       FOR n = 1 TO Len( aColumns )
          cColumns += aColumns[ n ] + ","
-      NEXT 
+      NEXT
       FOR EACH aRow IN aValues
          cValues += "("
          FOR EACH uData IN aRow
             IF ValType( uData ) == "C" .AND. ! lForceValue
-               uValue = Val2Escape( uData ) 
-            ELSE 
+               uValue = Val2Escape( uData )
+            ELSE
                uValue = uData
             ENDIF
             cValues += ClipValue2SQL( uValue ) + ","
          NEXT
          cValues  = SubStr( cValues, 1, Len( cValues ) - 1 ) + "),"
       NEXT
-      //Delete last coma 
+      //Delete last coma
       cColumns = SubStr( cColumns, 1, Len( cColumns ) - 1 ) + ") VALUES"
-      cValues  = SubStr( cValues, 1, Len( cValues ) - 1 )     
-   ELSE   
+      cValues  = SubStr( cValues, 1, Len( cValues ) - 1 )
+   ELSE
       FOR n = 1 TO Len( aColumns )
          cColumns += aColumns[ n ] + ","
          IF ValType( aValues[ n ] ) == "C" .AND. ! lForceValue
-            uValue = Val2Escape( aValues[ n ] ) 
-         ELSE 
+            uValue = Val2Escape( aValues[ n ] )
+         ELSE
             uValue = aValues[ n ]
          ENDIF
          cValues += ClipValue2SQL( uValue ) + ","
-      NEXT 
-      //Delete last coma 
+      NEXT
+      //Delete last coma
       cColumns = SubStr( cColumns, 1, Len( cColumns ) - 1 ) + ") VALUES ( "
-      cValues  = SubStr( cValues, 1, Len( cValues ) - 1 ) + ")"      
+      cValues  = SubStr( cValues, 1, Len( cValues ) - 1 ) + ")"
    ENDIF
-   
+
    cExecute = "INSERT INTO " + D_LowerCase( cTable ) + " ( " + cColumns + cValues
-   
+
    if cDuplicateKey != NIL
       cExecute += " ON DUPLICATE KEY UPDATE " + cDuplicateKey
    endif
-   
-   
+
+
 RETURN cExecute
 
 
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 FUNCTION Clip2Str( uValue, cPicture )
-   
+
    LOCAL cType := ValType( uValue )
    LOCAL cValue, cdf
-   
-   SWITCH cType 
+
+   SWITCH cType
       CASE "N"
          cValue = Transform( uValue, cPicture )
-         EXIT 
+         EXIT
       CASE "L"
          cValue = If( uValue, ".T.", ".F." )
-         EXIT 
+         EXIT
       CASE "D"
-      
+
          cValue = Transform( uValue, cPicture )
-         EXIT 
+         EXIT
 #ifdef __XHARBOUR__
       DEFAULT
-#else 
+#else
       OTHERWISE
-#endif   
+#endif
       cValue = Transform( uValue, cPicture )
    ENDSWITCH
-   
-RETURN cValue            
-         
 
-//----------------------------------------------------//  
+RETURN cValue
+
+
+//----------------------------------------------------//
 
 // Turn On/Off case sensitive use
 // return Last Status
@@ -2699,19 +2699,19 @@ FUNCTION D_SetPadRight( lOnOff )
 
 RETURN lOldStatus
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 // Convert lower case if case sesitive is off
 FUNCTION D_LowerCase( cText )
 
    IF ! D_SetCaseSensitive()
       cText = Lower( AllTrim( cText ) )
-   ELSE 
+   ELSE
       cText = AllTrim( cText )
    ENDIF
-   
+
 RETURN cText
-   
-//----------------------------------------------------//  
+
+//----------------------------------------------------//
 // Set logical values to default Mysql Values (1/0)->lOldStatus
 FUNCTION D_LogicalValue( lOnOff )
 
@@ -2727,7 +2727,7 @@ FUNCTION D_LogicalValue( lOnOff )
 
 RETURN lOldStatus
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 // use default clipper value when no fetched any row in query
 FUNCTION useClipperDefaultValue( lOnOff )
 
@@ -2742,34 +2742,34 @@ FUNCTION useClipperDefaultValue( lOnOff )
   ENDIF
 
 RETURN lOldStatus
-   
-//----------------------------------------------------//  
+
+//----------------------------------------------------//
 
 FUNCTION SetServerDefault( oServer ) ; oServerDefault := oServer ; return nil
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 FUNCTION GetServerDefault() ; return oServerDefault
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 FUNCTION GetServerFromName( cName )
    LOCAL nHost, oServer
-   
-   IF cName == NIL 
+
+   IF cName == NIL
       RETURN NIL
    ENDIF
- 
-   nHost = AScan( aHost, { | a | Upper( a[ 2 ] ) == Upper( cName ) } ) 
+
+   nHost = AScan( aHost, { | a | Upper( a[ 2 ] ) == Upper( cName ) } )
 
    IF nHost > 0
-      oServer = aHost[ nHost ][ 1 ] 
-   ENDIF 
+      oServer = aHost[ nHost ][ 1 ]
+   ENDIF
 
 RETURN oServer
 
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 FUNCTION _SelectHost( uParam )
    LOCAL lError := .F.
@@ -2781,72 +2781,72 @@ FUNCTION _SelectHost( uParam )
          SetServerDefault( uParam:oServer )
       ELSEIF uParam:IsKindOf( "TDOLPHINSRV" )
          SetServerDefault( uParam )
-      ELSE 
+      ELSE
          lError = .T.
       ENDIF
    ELSEIF hb_IsString( uParam )
        oServer = GetServerFromName( uParam )
        IF oServer != NIL
           SetServerDefault( oServer )
-       ELSE 
+       ELSE
           lError = .T.
-       ENDIF 
-   ENDIF 
-   
-   IF lError 
+       ENDIF
+   ENDIF
+
+   IF lError
       Dolphin_DefError( NIL, ERR_INVALIDHOSTSELECTION, .T. )
       RETURN NIL
-   ENDIF 
+   ENDIF
 
 RETURN GetServerDefault():cNameHost
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 PROCEDURE _BackupMySql( oServer, aTables, cFile, lDrop, lOverwrite, ;
                          nStep, cHeader, cFooter, lCancel, bOnBackup )
-                         
+
    DEFAULT oServer TO GetServerDefault()
-   
+
    oServer:Backup( aTables, cFile, lDrop, lOverwrite, ;
                          nStep, cHeader, cFooter, @lCancel, bOnBackup )
 
 RETURN
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 PROCEDURE _BeginTransaction( oServer )
 
    DEFAULT oServer TO GetServerDefault()
-   
+
    oServer:BeginTransaction()
 
 RETURN
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 PROCEDURE _CloseHosts( uParam )
-   
+
    LOCAL oServer, nHost
 
    IF hb_IsObject( uParam )
       uParam:End()
    ELSEIF hb_IsString( uParam )
-      uParam = AllTrim( Upper( uParam ) ) 
+      uParam = AllTrim( Upper( uParam ) )
       IF uParam == "ALL"
          AEval( aHost, {| aRow | aRow[ 1 ]:End() } )
-      ELSE 
+      ELSE
          oServer = GetServerFromName( uParam )
-         IF oServer == NIL 
+         IF oServer == NIL
             Dolphin_DefError( NIL, ERR_INVALIDHOSTSELECTION, .T. )
             RETURN
-         ENDIF             
+         ENDIF
          oServer:End()
       ENDIF
-   ENDIF 
+   ENDIF
 
 RETURN
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 PROCEDURE _CommitTransaction( oServer )
 
@@ -2855,46 +2855,46 @@ PROCEDURE _CommitTransaction( oServer )
 
 RETURN
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 PROCEDURE _ExecuteScript( oServer, cFile, bOnScrip )
 
    DEFAULT oServer TO GetServerDefault()
    oServer:ExecuteScript( cFile, bOnScrip )
 
-RETURN  
+RETURN
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 PROCEDURE _InsertMysql( oServer, cTable, aColumns, aValues )
 
    DEFAULT oServer TO GetServerDefault()
-   
+
    oServer:Insert( cTable, aColumns, aValues )
 
 RETURN
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 PROCEDURE _UpdateMysql( oServer, cTable, aColumns, aValues, cWhere  )
 
    DEFAULT oServer TO GetServerDefault()
-   
+
    oServer:Update( cTable, aColumns, aValues, cWhere )
 
 RETURN
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 PROCEDURE _RestoreMySql( oServer, cFile, lCancel, bOnRestote )
-                         
+
    DEFAULT oServer TO GetServerDefault()
-   
+
    oServer:Restore( cFile, @lCancel, bOnRestote )
 
 RETURN
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 PROCEDURE _RollBack( oServer )
 
@@ -2903,7 +2903,7 @@ PROCEDURE _RollBack( oServer )
 
 RETURN
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 FUNCTION _SelectTable( oServer, aColumns, aTables, cWhere,;
                        cGroup, cHaving, cOrder, cLimit, lWithRoll )
@@ -2911,21 +2911,21 @@ FUNCTION _SelectTable( oServer, aColumns, aTables, cWhere,;
    LOCAL oQuery
 
    DEFAULT oServer TO GetServerDefault()
-   
+
    aColumns = CheckArray( aColumns )
    aTables  = CheckArray( aTables )
-   
+
    oQuery = oServer:SelectTable( aColumns, aTables, cWhere, cGroup, ;
                                  cHaving, cOrder, cLimit, lWithRoll )
 
-RETURN oQuery                                    
+RETURN oQuery
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 FUNCTION setMultiStatement( hMyslq, lOnOf )
 return _setMultiStatement( hMyslq, lOnOf )
 
-//----------------------------------------------------//  
+//----------------------------------------------------//
 
 
 static function CheckArray( aArray )
@@ -2938,13 +2938,13 @@ static function CheckArray( aArray )
    endif
 
 return aArray
-   
-//----------------------------------------------------//  
+
+//----------------------------------------------------//
 
 PROCEDURE Dolphin_DefError( oServer, nError, lInternal, cExtra )
    LOCAL cText := ""
    LOCAL oError
-   
+
    DEFAULT cExtra TO ""
    oError := ErrorNew()
    oError:SubSystem   = If( lInternal, "TDOLPHIN", "MYSQL" )
@@ -2966,7 +2966,7 @@ RETURN
 //----------------------------------------------------//
 
 STATIC FUNCTION TransformQueryParams( cQuery, uParams )
-   
+
    LOCAL aKeys, uItem, nLen
 
    IF uParams != NIL
@@ -2980,7 +2980,7 @@ STATIC FUNCTION TransformQueryParams( cQuery, uParams )
          FOR uItem = 1 TO nLen
             cQuery = StrTran( cQuery, "&"+Alltrim( Str( uItem ) ), uParams[uItem])
          NEXT
-      ENDIF 
+      ENDIF
    ENDIF
 
 RETURN cQuery
