@@ -120,7 +120,10 @@ CLASS TDolphinSrv
    METHOD AddQuery( oQuery )          INLINE AAdd( ::aQueries, oQuery )
                               /*used internally*/
 
-   METHOD Backup( aTables, cFile, lDrop, lOver, nStep, cHeader, cFooter, lCancel )  
+   METHOD Backup( aTables, cFile, lDrop, lOver, nStep, cHeader, cFooter, lCancel )
+
+   METHOD b6Def( cField, cTable )     /* Returns default value for a single field */          // Biel 2606
+   METHOD b6DefAll( cTable )          /* Returns hash { fieldname => default } for all fields in one call */ // Biel 2606
 
    METHOD BeginTransaction()          INLINE ::SqlQuery( "BEGIN" )    
    
@@ -1707,6 +1710,50 @@ METHOD InsertFromDbf( cTable, cAlias, nLimit, aStruct, bOnInsert, cDuplicateKey,
    ENDIF
   
 RETURN lRet
+
+//----------------------------------------------------//
+
+METHOD b6Def( cField, cTable ) CLASS TDolphinSrv  // Biel 2606
+
+   LOCAL aStruct
+   LOCAL hRes
+
+   cField = D_LowerCase( cField )
+   cTable = D_LowerCase( cTable )
+
+   hRes = MySqlListFields( ::hMysql, cTable, cField )
+
+   IF hRes == NIL
+      ::CheckError()
+   ELSE
+      aStruct = MySqlResultStructure( hRes, D_SetCaseSensitive(), D_LogicalValue() )
+   ENDIF
+
+   hRes = NIL
+
+RETURN IIf( Empty(aStruct), NIL, aStruct[1][3] )
+
+//----------------------------------------------------//
+
+METHOD b6DefAll( cTable ) CLASS TDolphinSrv  // Biel 2606
+
+   LOCAL aStruct, hRes
+   LOCAL hDef := {=>}
+
+   cTable = D_LowerCase( cTable )
+
+   hRes = MySqlListFields( ::hMysql, cTable )
+
+   IF hRes == NIL
+      ::CheckError()
+   ELSE
+      aStruct = MySqlResultStructure( hRes, D_SetCaseSensitive(), D_LogicalValue() )
+      AEval( aStruct, {|a| hDef[ a[ MYSQL_FS_NAME ] ] := a[ MYSQL_FS_DEF ] } )
+   ENDIF
+
+   hRes = NIL
+
+RETURN hDef
 
 //----------------------------------------------------//
 

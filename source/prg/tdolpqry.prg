@@ -70,20 +70,20 @@
 
 CLASS TDolphinQry
 
-   DATA aColumns,;    // query active columns (select) 
+   DATA aColumns,;    // query active columns (select)
         aTables,;     // query active tables
         aRow,;        // info currect record selected
         aStructure    // type of each field, a copy is here a copy inside each row
    DATA aOldRow       // Value copy
    DATA aRowOriginal  // Original data values (without changes, like return from mysql)
-        
+
    DATA bBof,;        //codeblock to evaluate if the value is the first row
         bEof,;        //codeblock to evaluate if the value is the last row
         bOnFillArray,;//codeblock to evaluate while is filling array
         bOnChangePage,; //codeblock to evaluate when paginmation is activated and change page
         bOnLoadQuery,;  //codeblock to evaluate before load new Query
         bOnNewFilter   //codeblock to evaluate before set new query, should return .t./.f. to call BuildQuery
-   
+
    DATA cQuery,;        // copy of query that generated this object
         cWhere,;        // copy of WHERE command
         cGroup,;        // copy of GROUP BY command
@@ -92,11 +92,11 @@ CLASS TDolphinQry
         cLimit          // copy of LIMIT command
 
    DATA Cargo           // For programmer use
-   
+
    DATA hOldRow                // Hash Last row selected
-   DATA hResult                 
+   DATA hResult
    DATA hRow                   // Hash current row selected
-   
+
    DATA lBof                   // Begin of query, compatibility with dbf*/
    DATA lEof                   // End of Query, compatibility with dbf*/
    DATA lAppend
@@ -107,40 +107,40 @@ CLASS TDolphinQry
    DATA nRecCount              // number of rows in the current query
    DATA nRecNo                 // Current query row position
    DATA nQryId
-   
-   
+
+
    //Paginations datas
    DATA nCurrentPage           // Current page
    DATA nTotalRows             // Total row without limits
    DATA nPageStep              // total rows for page
    DATA nMaxPages              // Max pages avalaible in query
    DATA nCurrentLimit          // Current limit value
-   
+
    DATA oServer
    DATA oRow
-   
-   
+
+
    METHOD New( cQuery, oServer )
    METHOD End()        INLINE ::oServer:CloseQuery( ::nQryId ), ::oRow := NIL
 
-   METHOD Bof()        INLINE ::lBof  
-   
-   METHOD BuildDatas( cQuery ) 
+   METHOD Bof()        INLINE ::lBof
+
+   METHOD BuildDatas( cQuery )
    METHOD BuildDataWhere()     /* build a where with oldrow values */
-   
+
    METHOD BuildQuery( aColumns, aTables, cWhere, cGroup, cHaving, ;
-                      cOrder, cLimit, lWithRoll )   
-                      
+                      cOrder, cLimit, lWithRoll )
+
    METHOD CheckError( nError, cExtra )  INLINE ::oServer:CheckError( nError, cExtra )
                                /*Compatibility with CheckError from TDolphinSrv*/
 
    METHOD Delete( lAll )       /*Delete current record active*/
-#ifdef __WIN__   
+#ifdef __WIN__
    METHOD Export( nType, cFieldName, aColumns, aPictures )   ;
                        INLINE TDolphinExport():New( nType, Self, cFieldName, aColumns, aPictures )
 #endif __WIN__
-   METHOD Eof()        INLINE ::lEof  
-                      
+   METHOD Eof()        INLINE ::lEof
+
    METHOD FCount()     INLINE    ::nFCount
                                 /*returns the number of fields in the query, compatibility with dbf*/
 
@@ -152,38 +152,38 @@ CLASS TDolphinQry
                                 /*returns the position of the specified field*/
    METHOD FieldGet( cnField )   /*returns the value of the specified field*/
    METHOD FieldType( cnField )  /*returns the field type of the specified field*/
-   METHOD FieldMySqlType( cnField ) 
+   METHOD FieldMySqlType( cnField )
                                 /*returns the MySql field type of the specified field*/
-                                
+
    METHOD FieldPut( cnField, uValue )
                                 /*Set the value of a field variable using the ordinal position of the field.
-                                  returns the value assigned to the designated field.*/  
-                                  
-   METHOD FieldToNum( cnField ) HIDDEN                                                            
-   
+                                  returns the value assigned to the designated field.*/
+
+   METHOD FieldToNum( cnField ) HIDDEN
+
    METHOD FillArray( bOnFillArray, aColumns ) /*Fill and return a array with all query information*/
    METHOD FillHRow( lEmpty )                  /*Fill (or not) and return a Hash with current record selected*/
 
    METHOD FirstPage()   INLINE ::PrevPage( ::nCurrentPage - 1 )
                                 /*Go to first page in pagination*/
-   METHOD Find( aValues, aFields, nStart, nEnd, lRefresh )                                
-   
-   METHOD GetBlankRow()                       
+   METHOD Find( aValues, aFields, nStart, nEnd, lRefresh )
+
+   METHOD GetBlankRow()
    METHOD GetRow( nRow )        /*Fill aRow and Hash with current data row selected*/
    METHOD GoTo( nRow ) INLINE   ::GetRow( nRow )
                                 /*Goto specific Row (RecNo) and fill aRow/Hash*/
-                                
-   METHOD GetFieldsModified()   /*Return a Array with fields modified*/                             
-   
+
+   METHOD GetFieldsModified()   /*Return a Array with fields modified*/
+
    METHOD GetRowObj( nRow )     /*Return TDolphinRow Object*/
-                                
-   METHOD GoBottom()   INLINE   ::GetRow( ::nRecCount  ) 
+
+   METHOD GoBottom()   INLINE   ::GetRow( ::nRecCount  )
                                 /*Goto BOTTOM of Query and fill aRow/Hash*/
-                                
+
    METHOD GoTop()      INLINE   ::GetRow( 1 )
                                 /*Goto TOP of Query and fill aRow/Hash*/
-                                
-   METHOD IsEqual( nIdx )                                
+
+   METHOD IsEqual( nIdx )
 
    METHOD IsSingleTable() // INLINE Len( ::aTables ) == 1 Comented Biel 1709
    METHOD IsCommand()     INLINE ( ::IsSingleTable() .AND. Len( ::aColumns ) == 0 ) .OR. ;
@@ -193,64 +193,64 @@ CLASS TDolphinQry
    METHOD LastPage() INLINE ::NextPage( ::nMaxPages - ::nCurrentPage )
                                /*Go to Last page in pagination*/
 
-                                  
+
    METHOD LastRec()    INLINE     ::nRecCount
                                /*returns the number of rows in the current query, compatibility with dbf*/
 
    METHOD LoadQuery()          /*Load and fill current query*/
-   METHOD LoadNextQuery( lBuildData ) 
+   METHOD LoadNextQuery( lBuildData )
                                /*Load next result with multiple statement*/
-   
+
    METHOD Locate( aValues, aFields, nStart, nEnd, lSoft, lRefresh )
-                               
-   METHOD MakePrimaryKeyWhere() 
+
+   METHOD MakePrimaryKeyWhere()
                                /*Build Make Primary key if exist*/
-   
+
    METHOD GoToPage( nPage ) INLINE If( nPage > ::nCurrentPage, ;
                                       ::NextPage( nPage - ::nCurrentPage ), ;
                                       If( nPage < ::nCurrentPage, ::PrevPage( ::nCurrentPage - nPage ), ) )
-       
+
    METHOD NextPage( nSkip )    /* Go to next page avalaible with pagination active */
-   
+
    METHOD PrevPage( nSkip )    /* Go to previous page avalaible with pagination active */
-                              
+
    METHOD RecNo()      INLINE    ::nRecNo
                                /*returns the identity found at the position of the row pointer.*/
-                               
+
    METHOD RecCount()   INLINE ::LastRec()
                                /*Compatibility with TMysql*/
-                               
-   METHOD Refresh( lBuildData )    
-   
+
+   METHOD Refresh( lBuildData )
+
    METHOD Save()               /*Save current data*/
-                 
-   METHOD Seek( cSeek, cnField, nStart, nEnd, lSoft ) 
+
+   METHOD Seek( cSeek, cnField, nStart, nEnd, lSoft )
                                /*Move to the record having the specified cSeek value, in selected field
                                 from nStart to nEnd with SoftSeek*/
-                 
+
    METHOD SetData( nNum, uValue ) HIDDEN
                                /*set value into array or hash*/
-   
+
    METHOD SetNewFilter( nType, cFilter, lRefresh )
    METHOD SetWhere( cWhere, lRefresh )   INLINE ::SetNewFilter( SET_WHERE, cWhere, lRefresh )
    METHOD SetGroup( cGroup, lRefresh )   INLINE ::SetNewFilter( SET_GROUP, cGroup, lRefresh )
    METHOD SetHaving( cHaving, lRefresh ) INLINE ::SetNewFilter( SET_HAVING, cHaving, lRefresh )
    METHOD SetOrder( cOrder, lRefresh )   INLINE ::SetNewFilter( SET_ORDER, cOrder, lRefresh )
    METHOD SetLimit( cLimit, lRefresh )   INLINE ::SetNewFilter( SET_LIMIT, cLimit, lRefresh )
-   
+
    METHOD SetPages( nLimit )   /*Activate pagination and Set total rows by page*/
-  
+
    METHOD Skip( nRecords )
-   
+
    METHOD VerifyValue( nIdx, cField ) //HIDDEN
-   
+
    METHOD Undo( cnField )
 
    METHOD Zap() INLINE ::Delete( .T. )
                                /*Delete all record in table*/
-   
-   ERROR HANDLER ONERROR()   
-   
+
+   ERROR HANDLER ONERROR()
+
 ENDCLASS
 
 
@@ -269,11 +269,11 @@ METHOD New( cQuery, uServer, uParams ) CLASS TDolphinQry
       ::oServer = GetServerFromName( uServer )
    ENDIF
 
-   IF ::oServer == NIL   
+   IF ::oServer == NIL
       Dolphin_DefError( NIL, ERR_NODEFINDEDHOST, .T. )
-      RETURN NIL 
+      RETURN NIL
    ENDIF
-   
+
    ::cQuery  = TransformQueryParams( cQuery, uParams )
    ::nQryId  = ::oServer:GetQueryId()
    ::oServer:AddQuery( Self )
@@ -288,25 +288,25 @@ METHOD New( cQuery, uServer, uParams ) CLASS TDolphinQry
    ::cGroup        = ""
    ::cHaving       = ""
    ::cOrder        = ""
-   ::cLimit        = ""   
-   
+   ::cLimit        = ""
+
    ::aRow          = {}
    ::aOldRow       = {}
-   
+
    ::lPagination   = .F.
    ::lInverted     = .F.
-   
-#ifdef USE_HASH     
+
+#ifdef USE_HASH
    ::hRow      = Hash()
    ::hOldRow   = Hash()
 #endif /*USE_HASH*/
    ::lEof      = .T.
-   ::lBof      = .T.   
+   ::lBof      = .T.
    ::lAppend   = .F.
 
-   IF cQuery == NIL 
-      RETURN Self 
-   ENDIF 
+   IF cQuery == NIL
+      RETURN Self
+   ENDIF
 
    ::LoadQuery()
 
@@ -329,7 +329,7 @@ METHOD BuildDatas( cQuery ) CLASS TDolphinQry
                         "DESC",;
                         "ASC" }
    LOCAL nFind
-   
+
    DEFAULT cQuery TO ::cQuery
 
    cQuery := AllTrim( cQuery )
@@ -371,13 +371,13 @@ METHOD BuildDatas( cQuery ) CLASS TDolphinQry
             ENDIF
             EXIT
 
-         CASE 3 //"GROUP" 
+         CASE 3 //"GROUP"
             IF Empty( ::cGroup )
                ::cGroup  := AllTrim( SubStr( cItem, 10 ) )
             ENDIF
             EXIT
 
-         CASE 4 //"HAVING" 
+         CASE 4 //"HAVING"
             IF Empty( ::cHaving )
                ::cHaving := AllTrim( SubStr( cItem, 8 ) )
             ENDIF
@@ -393,14 +393,14 @@ METHOD BuildDatas( cQuery ) CLASS TDolphinQry
                ENDIF
             ENDIF
 
-            EXIT 
+            EXIT
 
          CASE 6 //"ORDER"
             IF Empty( ::cOrder )
                ::cOrder  := AllTrim(SubStr( cItem, 10 ))
             ENDIF
             EXIT
-            
+
          CASE 7 //"FROM"
             IF Empty( ::aTables )
                cTables := AllTrim( SubStr( cItem, 6 ) )
@@ -409,7 +409,7 @@ METHOD BuildDatas( cQuery ) CLASS TDolphinQry
             EXIT
 
          CASE 8//"DESC"    //  Gabri
-       
+
            if ! ::lPagination
               IF ! Empty( ::cOrder )
                  ::cOrder  += " DESC"
@@ -424,7 +424,7 @@ METHOD BuildDatas( cQuery ) CLASS TDolphinQry
                ENDIF
             Endif
             EXIT
-            
+
       ENDSWITCH
    NEXT
 
@@ -438,14 +438,14 @@ METHOD BuildDataWhere() CLASS TDolphinQry
    LOCAL aField
    LOCAL cWhere := ""
    LOCAL nIdx
-   
-   FOR EACH aField IN ::aStructure 
-#ifdef USE_HASH 
+
+   FOR EACH aField IN ::aStructure
+#ifdef USE_HASH
       uValue = ::hOldRow[ "_" + D_LowerCase( aField[ MYSQL_FS_NAME ] ) ]
-#else 
+#else
 #ifndef __XHARBOUR__
       nIdx = aField:__EnumIndex()
-#else 
+#else
       nIdx = HB_EnumINdex()
 #endif /*__HARBOUR__*/
       uValue = ::aOldRow[ nIdx ]
@@ -453,7 +453,7 @@ METHOD BuildDataWhere() CLASS TDolphinQry
       IF ValType( uValue ) == "C"
          IF Len( uValue ) < 65536
             uValue = Val2Escape( uValue )
-         ELSE 
+         ELSE
             uValue = MySqlEscape( uValue )
          ENDIF
       ENDIF
@@ -464,11 +464,11 @@ METHOD BuildDataWhere() CLASS TDolphinQry
         cWhere += aField[ MYSQL_FS_NAME ] + If( uValue == NIL .OR. ( HB_IsString( uValue ) .AND. Empty( uValue ) ) .OR. ( HB_IsDate( uValue ) .AND. Empty( uValue ) ), " IS ", " = " ) + ;
                    ClipValue2Sql( uValue, , , .F. ) + " AND "
       ENDIF
-          
+
    NEXT
-   
-   //Delete last AND 
-   
+
+   //Delete last AND
+
    cWhere = Left( cWhere, Len( cWhere ) - 5 )
 
 RETURN cWhere
@@ -479,7 +479,7 @@ METHOD BuildQuery( aColumns, aTables, cWhere, cGroup, cHaving, ;
                    cOrder, cLimit, lWithRoll ) CLASS TDolphinQry
 
    LOCAL cQuery := ""
-   
+
    DEFAULT aColumns TO {}
    DEFAULT aTables  TO {}
    DEFAULT cWhere   TO ""
@@ -487,17 +487,17 @@ METHOD BuildQuery( aColumns, aTables, cWhere, cGroup, cHaving, ;
    DEFAULT cHaving  TO ""
    DEFAULT cOrder   TO ""
    DEFAULT cLimit   TO ""
-   
+
    ::aColumns = aColumns
    ::aTables  = aTables
    ::cWhere   = cWhere
    ::cGroup   = cGroup
    ::cHaving  = cHaving
    ::cOrder   = cOrder
-   ::cLimit   = cLimit 
+   ::cLimit   = cLimit
 
    cQuery = BuildQuery( aColumns, aTables, cWhere, cGroup, cHaving, cOrder, cLimit, lWithRoll )
-   
+
 
 RETURN cQuery
 
@@ -537,8 +537,8 @@ METHOD Delete( lAll ) CLASS TDolphinQry
 
    If ::oServer:SqlQuery( cQry )
       ::LoadQuery()
-   Else 
-      RETURN .F. 
+   Else
+      RETURN .F.
    EndIf
 
 RETURN .T.
@@ -547,7 +547,7 @@ RETURN .T.
 //----------------------------------------------------//
 
 METHOD FieldGet( cnField ) CLASS TDolphinQry
-   
+
    LOCAL cFieldName
    LOCAL nNum
    LOCAL lError := .F.
@@ -555,25 +555,25 @@ METHOD FieldGet( cnField ) CLASS TDolphinQry
 
 //   ::Cargo:cTitle = Time() + " " + Str( ::xLock )
 #ifdef USE_HASH
-      IF HB_IsNumeric( cnField )         
+      IF HB_IsNumeric( cnField )
          IF Len( ::aRowOriginal ) > 0
             uValue = ::aRowOriginal[ cnField ]
          ENDIF
          nNum   = cnField
-      ELSE 
-         nNum := ::FieldToNum( cnField )   
+      ELSE
+         nNum := ::FieldToNum( cnField )
          cFieldName := "_" + D_LowerCase( cnField )
          IF hGetPos( ::hRow, cFieldName ) > 0
-            uValue = ::hRow[ cFieldName ] 
+            uValue = ::hRow[ cFieldName ]
          ELSE
             lError = .T.
          ENDIF
       ENDIF
-#else      
+#else
       IF nNum > 0
          uValue = ::aRow[ nNum ]
-      ELSE 
-         lError = .T. 
+      ELSE
+         lError = .T.
       ENDIF
 
 #endif /*USE_HASH*/
@@ -582,24 +582,24 @@ METHOD FieldGet( cnField ) CLASS TDolphinQry
       ::oServer:nInternalError = ERR_INVALIDFIELDGET
       ::CheckError( , hb_dumpvar( cnField ) )
       RETURN NIL
-   ENDIF   
-#endif 
-RETURN ::VerifyValue( nNum, uValue )       
+   ENDIF
+#endif
+RETURN ::VerifyValue( nNum, uValue )
 
 //----------------------------------------------------//
 
 METHOD FieldName( nNum ) CLASS TDolphinQry
    LOCAL cName := ""
-   
+
    IF nNum > 0 .AND. nNum <= ::nFCount
       cName = ::aStructure[ nNum ][ MYSQL_FS_NAME ]
-#ifndef NOINTERNAL      
-   ELSE 
+#ifndef NOINTERNAL
+   ELSE
       ::oServer:nInternalError = ERR_INVALIDFIELDNUM
       ::CheckError( , hb_dumpvar( nNum ) )
-#endif      
+#endif
    ENDIF
-    
+
 RETURN cName
 
 //----------------------------------------------------//
@@ -635,7 +635,7 @@ METHOD FieldPos( cFieldName ) CLASS TDolphinQry
    ENDIF
 
 #ifndef NOINTERNAL
-   IF nPos == 0 
+   IF nPos == 0
       ::oServer:nInternalError = ERR_INVALIDFIELDNAME
       ::CheckError( , hb_dumpvar( cFieldName ) )
    ENDIF
@@ -682,30 +682,30 @@ METHOD FieldPut( cnField, uValue ) CLASS TDolphinQry
    IF nNum > 0 .AND. nNum <= ::nFCount
 
 #ifdef USE_HASH
-      IF ValType( cnField ) == "N" 
+      IF ValType( cnField ) == "N"
          cCol = cCol := "_" + ::aStructure[ nNum ][ MYSQL_FS_NAME ]
-      ELSE 
+      ELSE
          cCol = "_" + Lower( cnField )
       ENDIF
       IF ( Valtype( uValue ) == Valtype( ::hRow[ cCol ] ) .OR. Empty( ::hRow[ cCol ] ) ) .OR. ::hRow[ cCol ] == NIL
-#else      
-      IF Valtype( uValue ) == Valtype( ::aRow[ nNum ] .OR. Empty( ::aRow[ nNum ] ) ) .OR. ::aRow[ nNum ] == NIL      
-#endif      
+#else
+      IF Valtype( uValue ) == Valtype( ::aRow[ nNum ] .OR. Empty( ::aRow[ nNum ] ) ) .OR. ::aRow[ nNum ] == NIL
+#endif
          IF ValType( uValue ) == "C"
             uValue := MySqlEscape( AllTrim( uValue ), ::oServer:hMySql )
          ENDIF
 #ifdef USE_HASH
-         
+
          HSet( ::hRow, cCol, uValue )
-#else 
+#else
          ::aRow[ nNum ]    := uValue
 #endif /*USE_HASH*/
          RETURN uValue
-#ifndef NOINTERNAL         
-      ELSE 
+#ifndef NOINTERNAL
+      ELSE
          ::oServer:nInternalError = ERR_INVALIDFIELDTYPE
          ::CheckError( , hb_dumpvar( cnField ) )
-#endif      
+#endif
       ENDIF
    ENDIF
 
@@ -721,7 +721,7 @@ METHOD FieldToNum( cnField ) CLASS TDolphinQry
    ELSE
       nNum := cnField
    ENDIF
-   
+
 RETURN nNum
 
 
@@ -731,7 +731,7 @@ METHOD FillArray( bOnFillArray, aColumns ) CLASS TDolphinQry
 
    LOCAL aTable := {}, aRow, uField
    LOCAL n, aGet, i := 0, aStructure := {}
-   
+
 
    DEFAULT bOnFillArray TO ::bOnFillArray
 
@@ -739,27 +739,27 @@ METHOD FillArray( bOnFillArray, aColumns ) CLASS TDolphinQry
       FOR EACH uField IN ::aStructure
          AAdd( aStructure, uField[ MYSQL_FS_NAME ] )
       NEXT
-      aColumns = aStructure  
+      aColumns = aStructure
    ELSE
       aStructure = aColumns
    ENDIF
-   
+
 #ifndef NOINTERNAL
    FOR EACH uField IN aColumns
       ::FieldPos( uField )
-   NEXT 
+   NEXT
 #endif
 
    IF ::nRecCount > 0
-         
+
       WHILE ! ::lEof
          aRow = {}
-#ifdef USE_HASH         
-         AEval( aStructure, { | cField | AAdd( aRow, ::hRow[ "_" + cField ] ) } ) 
-#else 
-         AEval( aStructure, { | cField | AAdd( aRow, ::aRow[ ::FieldPos( cField ) ] ) } ) 
-#endif         
-         IF bOnFillArray != NIL 
+#ifdef USE_HASH
+         AEval( aStructure, { | cField | AAdd( aRow, ::hRow[ "_" + cField ] ) } )
+#else
+         AEval( aStructure, { | cField | AAdd( aRow, ::aRow[ ::FieldPos( cField ) ] ) } )
+#endif
+         IF bOnFillArray != NIL
             Eval( bOnFillArray, aRow, ++i )
          ENDIF
          IF Len( aColumns ) == 1
@@ -768,22 +768,22 @@ METHOD FillArray( bOnFillArray, aColumns ) CLASS TDolphinQry
             AAdd( aTable, aRow )
          ENDIF
          ::Skip()
-      END 
+      END
    ENDIF
 
-RETURN aTable 
+RETURN aTable
 
 //----------------------------------------------------//
 
 METHOD FillHRow( lEmpty ) CLASS TDolphinQry
    LOCAL uField
-   LOCAL hData := Hash() 
-   
+   LOCAL hData := Hash()
+
    DEFAULT lEmpty TO .F.
 
    FOR EACH uField IN ::aStructure
       HSet( hData, uField[ MYSQL_FS_NAME ], if( lEmpty, NIL, ::FieldGet( uField[ MYSQL_FS_NAME ] ) ) )
-   NEXT   
+   NEXT
 
 RETURN hData
 
@@ -794,36 +794,36 @@ METHOD Find( aValues, aFields, nStart, nEnd, lRefresh, lSoft ) CLASS TDolphinQry
    LOCAL nNum
    LOCAL nSeek
    LOCAL uValue, cField, nId
-   
+
    DEFAULT lRefresh TO .T.
    DEFAULT lSoft TO .F.
-   
-   IF ::nRecCount == 0 
+
+   IF ::nRecCount == 0
       RETURN 0
    ENDIF
-   
+
    FOR EACH cField IN aFields
-      cField = ::FieldToNum( cField ) 
+      cField = ::FieldToNum( cField )
    NEXT
 
    FOR EACH uValue IN aValues
 #ifdef __XHARBOUR__
       nId = HB_EnumINdex()
-#else 
+#else
       nId = uValue:__EnumIndex()
-#endif               
+#endif
       uValue = ClipValue2SQL( uValue, ::aStructure[ aFields[ nId ] ][ MYSQL_FS_CLIP_TYPE ], .F. )
    NEXT
-   
+
    nSeek = MyFind( ::hResult, aFields, aValues, nStart, nEnd, lSoft )
-   
-   IF nSeek > 0 
+
+   IF nSeek > 0
       IF lRefresh
          ::GetRow( nSeek )
       ENDIF
-   ENDIF   
-   
-RETURN nSeek 
+   ENDIF
+
+RETURN nSeek
 
 
 //----------------------------------------------------//
@@ -839,97 +839,97 @@ METHOD GetBlankRow( lRow ) CLASS TDolphinQry
    IF ! ::IsSingleTable()
       ::oServer:nInternalError = ERR_INVALIDGETBLANKROW
       ::CheckError()
-      RETURN NIL 
+      RETURN NIL
    ENDIF
-#endif 
-   
+#endif
+
    ::oRow = NIL
-   
+
    DEFAULT lRow TO .T.
-   
+
    ::lAppend := .T.
 
    aRow    = Array( Len( ::aStructure ) )
-   
+
 #ifndef USE_HASH
    ::aRow    = Array( Len( ::aStructure ) )
    ::aOldRow = AClone( aRow )
 #endif
-   
+
    FOR EACH uItem IN aRow
-     
+
 #ifdef __XHARBOUR__
       nIdx = HB_EnumIndex()
-#else 
+#else
       nIdx = uItem:__EnumIndex()
 #endif
 
       cType := ::aStructure[ nIdx ][ MYSQL_FS_CLIP_TYPE ]
       SWITCH cType
-      
+
       CASE "M"
          // we can not use PadR in  memo field
          IF ::aStructure[ nIdx ][ MYSQL_FS_DEF ] != NIL
             uValue = ::aStructure[ nIdx ][ MYSQL_FS_DEF ]
-         ELSE 
+         ELSE
             uValue = ""
-         ENDIF 
-         EXIT         
+         ENDIF
+         EXIT
       CASE "C"
          IF D_SetPadRight()
             nPad = Min( If( ::aStructure[ nIdx ][ MYSQL_FS_MAXLEN ] > ::aStructure[ nIdx ][ MYSQL_FS_LENGTH ],;
                       ::aStructure[ nIdx ][ MYSQL_FS_MAXLEN ], ::aStructure[ nIdx ][ MYSQL_FS_LENGTH] ), MAX_BLOCKSIZE )
-         ELSE 
-            nPad = 0 
+         ELSE
+            nPad = 0
          ENDIF
          IF ::aStructure[ nIdx ][ MYSQL_FS_DEF ] != NIL
             uValue = PadR( ::aStructure[ nIdx ][ MYSQL_FS_DEF ], Max( Len( ::aStructure[ nIdx ][ MYSQL_FS_DEF ] ), nPad ) )
-         ELSE 
+         ELSE
             uValue = Space( nPad )
-         ENDIF 
+         ENDIF
          EXIT
 
       CASE "N"
       CASE "I"
          IF ::aStructure[ nIdx ][ MYSQL_FS_DEF ] != NIL
             uValue = Val( ::aStructure[ nIdx ][ MYSQL_FS_DEF ] )
-         ELSE 
+         ELSE
             uValue = 0
-         ENDIF 
+         ENDIF
          EXIT
 
       CASE "L"
          IF ::aStructure[ nIdx ][ MYSQL_FS_DEF ] != NIL
             uValue = ::aStructure[ nIdx ][ MYSQL_FS_DEF ] == "1"
-         ELSE 
+         ELSE
             uValue = .F.
-         ENDIF 
-         
+         ENDIF
+
          EXIT
 
       CASE "D"
          IF ::aStructure[ nIdx ][ MYSQL_FS_DEF ] != NIL
             uValue = SqlDate2Clip( ::aStructure[ nIdx ][ MYSQL_FS_DEF ] )
-         ELSE 
+         ELSE
             uValue = CToD("")
-         ENDIF 
-      
+         ENDIF
+
          EXIT
 
 #ifdef __XHARBOUR__
       DEFAULT
-#else 
+#else
       OTHERWISE
 #endif
          uValue := nil
       END
       ::SetData( nIdx, uValue )
    NEXT
-   
+
    IF lRow
       ::oRow = ::GetRowObj()
    ENDIF
-   
+
 RETURN ::oRow
 
 //----------------------------------------------------//
@@ -958,7 +958,7 @@ METHOD GetRow( nRow ) CLASS TDolphinQry
             ::lBof    = .F.
             ::lEof    = .T.
             ::nRecNo  = ::nRecCount
-         CASE nRow < 1 
+         CASE nRow < 1
             ::lBof    = .T.
             ::lEof    = .F.
             ::nRecNo  = 1
@@ -969,12 +969,12 @@ METHOD GetRow( nRow ) CLASS TDolphinQry
 
       aRow    = MySqlFetchRow( ::hResult )
       ::aRowOriginal = aRow
-            
+
 #ifndef USE_HASH
       ::aRow    = Array( Len( aRow ) )
       ::aOldRow = Array( Len( aRow ) )
 #endif /*USE_HASH*/
-      
+
 
       //fill ::aRow Info
       IF aRow != NIL .AND. ::nRecCount > 0
@@ -987,16 +987,16 @@ METHOD GetRow( nRow ) CLASS TDolphinQry
 #endif
 
             uValue = ::VerifyValue( nIdx, cField )
-        
+
             ::SetData( nIdx, uValue )
          NEXT
       ELSE
 
          IF useClipperDefaultValue()
             aStructure = ::aStructure
-            
+
             //hRow = Hash()
-            
+
             FOR EACH uItem IN aStructure
    #ifdef __XHARBOUR__
                nIdx = HB_EnumIndex()
@@ -1005,59 +1005,59 @@ METHOD GetRow( nRow ) CLASS TDolphinQry
    #endif
                cType := uItem[ MYSQL_FS_CLIP_TYPE ]
                SWITCH cType
-               
+
                CASE "M"
                   // we can not use PadR in  memo field
                   IF uItem[ MYSQL_FS_DEF ] != NIL
                      uValue = uItem[ MYSQL_FS_DEF ]
-                  ELSE 
+                  ELSE
                      uValue = ""
-                  ENDIF 
-                  EXIT         
+                  ENDIF
+                  EXIT
                CASE "C"
                   IF D_SetPadRight()
                      nPad = Min( If( uItem[ MYSQL_FS_MAXLEN ] > uItem[ MYSQL_FS_LENGTH ],;
                                uItem[ MYSQL_FS_MAXLEN ], uItem[ MYSQL_FS_LENGTH] ), MAX_BLOCKSIZE )
-                  ELSE 
-                     nPad = 0 
+                  ELSE
+                     nPad = 0
                   ENDIF
                   IF uItem[ MYSQL_FS_DEF ] != NIL
                      uValue = PadR( uItem[ MYSQL_FS_DEF ], Max( Len( uItem[ MYSQL_FS_DEF ] ), nPad ) )
-                  ELSE 
+                  ELSE
                      uValue = Space( nPad )
-                  ENDIF 
+                  ENDIF
                   EXIT
 
                CASE "N"
                CASE "I"
                   IF uItem[ MYSQL_FS_DEF ] != NIL
                      uValue = Val( uItem[ MYSQL_FS_DEF ] )
-                  ELSE 
+                  ELSE
                      uValue = 0
-                  ENDIF 
+                  ENDIF
                   EXIT
 
                CASE "L"
                   IF uItem[ MYSQL_FS_DEF ] != NIL
                      uValue = uItem[ MYSQL_FS_DEF ] == "1"
-                  ELSE 
+                  ELSE
                      uValue = .F.
-                  ENDIF 
-                  
+                  ENDIF
+
                   EXIT
 
                CASE "D"
                   IF uItem[ MYSQL_FS_DEF ] != NIL
                      uValue = SqlDate2Clip( uItem[ MYSQL_FS_DEF ] )
-                  ELSE 
+                  ELSE
                      uValue = CToD("")
-                  ENDIF 
-               
+                  ENDIF
+
                   EXIT
 
          #ifdef __XHARBOUR__
                DEFAULT
-         #else 
+         #else
                OTHERWISE
          #endif
                   uValue := nil
@@ -1068,12 +1068,12 @@ METHOD GetRow( nRow ) CLASS TDolphinQry
             NEXT
          ENDIF
       ENDIF
-#ifndef NOINTERNAL      
-   ELSE 
+#ifndef NOINTERNAL
+   ELSE
       ::oServer:nInternalError = ERR_FAILEDGETROW
       ::nRecNo = 0
       ::CheckError()
-#endif       
+#endif
    ENDIF
 
 RETURN ::nRecNo
@@ -1086,16 +1086,16 @@ METHOD GetFieldsModified() CLASS TDolphinQry
    LOCAL aOut := {}
 
    FOR EACH aField IN ::aStructure
-      
+
 #ifdef USE_HASH
       uValue = ::FieldGet( aField[ MYSQL_FS_NAME ] )
       uOldValue = ::hOldRow[ "_" + aField[ MYSQL_FS_NAME ] ]
-#else 
+#else
 #ifdef __XHARBOUR__
       nIdx = HB_EnumIndex()
 #else
       nIdx = aField:__EnumIndex()
-#endif /*__XHARBOUR__*/ 
+#endif /*__XHARBOUR__*/
       uValue = ::FieldGet( aField[ MYSQL_FS_NAME ] )
       uOldValue = ::aOldRow[ nIdx ]
 #endif /*USE_HASH*/
@@ -1103,7 +1103,7 @@ METHOD GetFieldsModified() CLASS TDolphinQry
          AAdd( aOut, aField[ MYSQL_FS_NAME ] )
       ENDIF
    NEXT
-   
+
 RETURN aOut
 
 //----------------------------------------------------//
@@ -1112,14 +1112,14 @@ METHOD GetRowObj( nRow ) CLASS TDolphinQry
 
    IF nRow != NIL .AND. nRow != ::nRecNo
       ::Goto( nRow )
-   ENDIF 
-   
-   IF ::oRow != NIL 
-      ::oRow = NIL 
+   ENDIF
+
+   IF ::oRow != NIL
+      ::oRow = NIL
    ENDIF
 #ifdef USE_HASH
    ::oRow = TDolphinRow():New( Self )
-#else 
+#else
    ::oRow = TDolphinRow():New( Self )
 #endif /*USE_HASH*/
 RETURN ::oRow
@@ -1127,26 +1127,26 @@ RETURN ::oRow
 //----------------------------------------------------//
 
 METHOD IsEqual( cnField ) CLASS TDolphinQry
-   
+
    LOCAL nPos := 0
    LOCAL lEqual := .F.
-   
+
    IF ValType( cnField ) == "N"
       cnField = ::FieldName( cnField )
    ENDIF
-   
+
    nPos = ::FieldPos( cnField )
-   
-   IF nPos > 0   
+
+   IF nPos > 0
 #ifdef USE_HASH
       if ! ( Empty( ::hOldRow[ "_" + cnField ] ) .AND. ! empty(::hRow[ "_" + cnField ] ) )
         lEqual = ::hRow[ "_" + cnField ] == ::hOldRow[ "_" + cnField ]
       endif
-#else 
-      lEqual = ::aRow( cnField ) == ::aOldRow( cnField ) 
+#else
+      lEqual = ::aRow( cnField ) == ::aOldRow( cnField )
 #endif /*USE_HASH*/
    ENDIF
-   
+
 RETURN lEqual
 
 //<begin> Biel 1709
@@ -1174,39 +1174,40 @@ METHOD LoadNextQuery() CLASS TDolphinQry
 
    LOCAL oServer := ::oServer
    LOCAL cQuery  := ::cQuery
-   LOCAL aField, nIdx, cCol
+   LOCAL aField, nIdx, cCol, hDef
    LOCAL lCaseSen := D_SetCaseSensitive()
    LOCAL nNext
 
    nNext = ::oServer:NextResult()
 
    IF nNext == -1
-      RETURN 	NIL
-   ELSEIF nNext > 0 
+      RETURN    NIL
+   ELSEIF nNext > 0
       ::CheckError()
       RETURN NIL
    ENDIF
 
-   IF ::bOnLoadQuery != NIL 
+   IF ::bOnLoadQuery != NIL
       Eval( ::bOnLoadQuery, Self )
    ENDIF
-   
+
    IF ::hResult != NIL
       ::hResult = NIL
    ENDIF
-   
+
    ::hResult := MySqlStoreResult( oServer:hMysql )
 
    IF ! ( ::hResult == NIL )
       ::aStructure = MySqlResultStructure( ::hResult, lCaseSen, D_LogicalValue() )
-      /*<Begin> Biel 1709. ::aStructure no contenia el valor por defecto. Con b6Def si lo contiene. b6Def llama MySqlListFields( ::hMysql, cTable, cField ) del API
-        que si devuelve el valor por defecto */
+      /*<Begin> Biel 1709/2606. ::aStructure no contenia el valor por defecto.
+        MySqlListFields si devuelve MYSQL_FS_DEF; se obtienen todos los campos
+        en una sola llamada y se mapean al aStructure resultante. */
       IF ::IsSingleTable()
-         FOR EACH aField IN ::aStructure
-            aField[ MYSQL_FS_DEF ] := ::oServer:b6Def( aField[ MYSQL_FS_NAME ], ::aTables[1] )
-         NEXT
+         hDef := ::oServer:b6DefAll( ::aTables[1] )                                              // Biel 2606
+         AEval( ::aStructure, {|a| a[ MYSQL_FS_DEF ] := hb_hGetDef( hDef, a[ MYSQL_FS_NAME ], NIL ) } ) // Biel 2606
+         hDef := NIL
       ENDIF
-      //<end> Biel 1709
+      //<end> Biel 1709/2606
       ::nRecCount := MySqlNumRows( ::hResult )
       ::nRecNo    = Max( 1, ::nRecNo )
       ::nFCount   = Len( ::aStructure )
@@ -1232,14 +1233,14 @@ METHOD LoadNextQuery() CLASS TDolphinQry
       NEXT
 #endif /*USE_HASH*/
       ::GetRow()
-      
+
    ELSE
       IF MySqlFieldCount( oServer:hMysql ) == 0
          ::CheckError()
-      ENDIF    
-   ENDIF  
-   
-RETURN NIL 
+      ENDIF
+   ENDIF
+
+RETURN NIL
 
 
 //----------------------------------------------------//
@@ -1249,46 +1250,51 @@ METHOD LoadQuery( lBuildData ) CLASS TDolphinQry
 
    LOCAL oServer := ::oServer
    LOCAL cQuery  := ::cQuery
-   LOCAL aField, nIdx, cCol
+   LOCAL aField, nIdx, cCol, hDef
    LOCAL lCaseSen := D_SetCaseSensitive()
 
    DEFAULT lBuildData TO .T.
 
-   IF ::bOnLoadQuery != NIL 
+   IF ::bOnLoadQuery != NIL
       Eval( ::bOnLoadQuery, Self )
    ENDIF
 
    IF ! oServer:SQLQuery( cQuery )
-      RETURN NIL 
+      RETURN NIL
    ENDIF
-   
+
    //we need unlock current record locked
-   
+
    IF lBuildData
       ::BuildDatas()
    ENDIF
-   
+
    IF ::hResult != NIL
 //      MySqlFreeResult( ::hResult ) /* NOTE: Deprecated */
       ::hResult = NIL
    ENDIF
-   
+
    ::hResult := MySqlStoreResult( oServer:hMysql )
 //   ::hResult := MySqlUseResult( oServer:hMysql )
 
    IF ! ( ::hResult == NIL )
-      ::aStructure = MySqlResultStructure( ::hResult, lCaseSen, D_LogicalValue() ) 
+      ::aStructure = MySqlResultStructure( ::hResult, lCaseSen, D_LogicalValue() )
+      IF ::IsSingleTable()                                                                        // Biel 2606
+         hDef := ::oServer:b6DefAll( ::aTables[1] )                                              // Biel 2606
+         AEval( ::aStructure, {|a| a[ MYSQL_FS_DEF ] := hb_hGetDef( hDef, a[ MYSQL_FS_NAME ], NIL ) } ) // Biel 2606
+         hDef := NIL                                                                              // Biel 2606
+      ENDIF                                                                                       // Biel 2606
       ::nRecCount := MySqlNumRows( ::hResult )
       ::nRecNo    = Max( 1, ::nRecNo )
       ::nFCount   = Len( ::aStructure )
-   
+
       IF ::nRecCount > 0
          ::lEof      := .F.
          ::lBof      := .T.
       ELSE
          ::lEof      := .T.
          ::lBof      := .T.
-      ENDIF   
+      ENDIF
 
 #ifdef USE_HASH
       //Build Hash
@@ -1303,14 +1309,14 @@ METHOD LoadQuery( lBuildData ) CLASS TDolphinQry
       NEXT
 #endif /*USE_HASH*/
       ::GetRow()
-      
+
    ELSE
       IF MySqlFieldCount( oServer:hMysql ) == 0
          ::CheckError( , ::cQuery )
-      ENDIF    
-   ENDIF  
-   
-RETURN NIL 
+      ENDIF
+   ENDIF
+
+RETURN NIL
 
 
 //----------------------------------------------------//
@@ -1320,36 +1326,36 @@ METHOD Locate( aValues, aFields, nStart, nEnd, lRefresh, lSoft ) CLASS TDolphinQ
    LOCAL nNum
    LOCAL nSeek
    LOCAL uValue, cField, nId
-   
+
    DEFAULT lRefresh TO .T.
    DEFAULT lSoft TO .F.
 
-   IF ::nRecCount == 0 
+   IF ::nRecCount == 0
       RETURN 0
    ENDIF
-   
+
    FOR EACH cField IN aFields
-      cField = ::FieldToNum( cField ) 
+      cField = ::FieldToNum( cField )
    NEXT
 
    FOR EACH uValue IN aValues
 #ifdef __XHARBOUR__
       nId = HB_EnumINdex()
-#else 
+#else
       nId = uValue:__EnumIndex()
-#endif               
+#endif
       uValue = ClipValue2SQL( uValue, ::aStructure[ aFields[ nId ] ][ MYSQL_FS_CLIP_TYPE ], .F. )
    NEXT
-   
+
    nSeek = MyLocate( ::hResult, aFields, aValues, nStart, nEnd, lSoft )
 
-   IF nSeek > 0 
+   IF nSeek > 0
       IF lRefresh
          ::GetRow( nSeek )
       ENDIF
    ENDIF
-   
-RETURN nSeek 
+
+RETURN nSeek
 
 //----------------------------------------------------//
 
@@ -1361,59 +1367,59 @@ METHOD MakePrimaryKeyWhere() CLASS TDolphinQry
 //   IF Empty( ::cWhere )
 
       FOR EACH aField IN ::aStructure
-   
+
          // search for fields part of a primary key
          IF IS_PRIMARY_KEY( aField[ MYSQL_FS_FLAGS ] ) .OR.;
             IS_MULTIPLE_KEY( aField[ MYSQL_FS_FLAGS ] )
-   
-            cWhere += aField[ MYSQL_FS_NAME ] 
-   
+
+            cWhere += aField[ MYSQL_FS_NAME ]
+
             // if a part of a primary key has been changed, use original value
-#ifdef __XHARBOUR__         
+#ifdef __XHARBOUR__
             nIdx = HB_EnumIndex()
-#else 
+#else
             nIdx = aField:__EnumIndex()
-#endif /*__XHARBOUR__*/   
-   
+#endif /*__XHARBOUR__*/
+
 #ifdef USE_HASH
             IF ! ::IsEqual( aField[ MYSQL_FS_NAME ] )
                uValue = ::hOldRow[ "_" + aField[ MYSQL_FS_NAME ] ]
                cWhere += If( ! IS_NOT_NULL( aField[ MYSQL_FS_FLAGS ] ) .AND. ;
                              ( uValue == NIL .OR. ( HB_IsString( uValue ) .AND. Empty( uValue ) ) ), " IS ", " = " )
                cWhere += ClipValue2SQL( uValue, ;
-                                        aField[ MYSQL_FS_CLIP_TYPE ], , IS_NOT_NULL( aField[ MYSQL_FS_FLAGS ] ) ) 
+                                        aField[ MYSQL_FS_CLIP_TYPE ], , IS_NOT_NULL( aField[ MYSQL_FS_FLAGS ] ) )
             ELSE
                uValue = ::hRow[ "_" + aField[ MYSQL_FS_NAME ] ]
                cWhere += If( ! IS_NOT_NULL( aField[ MYSQL_FS_FLAGS ] ) .AND. ;
                              ( uValue == NIL .OR. ( HB_IsString( uValue ) .AND. Empty( uValue ) ) ), " IS ", " = " )
                cWhere += ClipValue2SQL( uValue,;
-                                        aField[ MYSQL_FS_CLIP_TYPE ], , IS_NOT_NULL( aField[ MYSQL_FS_FLAGS ] ) ) 
+                                        aField[ MYSQL_FS_CLIP_TYPE ], , IS_NOT_NULL( aField[ MYSQL_FS_FLAGS ] ) )
             ENDIF
-#else         
+#else
             cWhere += If(  uValue == NIL .OR. ( HB_IsString( uValue ) .AND. Empty( uValue ) ), " IS ", " = " )
             IF ! ::IsEqual( nIdx )
                uValue = ::aOldRow[ nIdx ]
                cWhere += If( ! IS_NOT_NULL( aField[ MYSQL_FS_FLAGS ] ) .AND. ;
                              ( uValue == NIL .OR. ( HB_IsString( uValue ) .AND. Empty( uValue ) ) ), " IS ", " = " )
-               cWhere += ClipValue2SQL( uValue, aField[ MYSQL_FS_CLIP_TYPE ] ) 
+               cWhere += ClipValue2SQL( uValue, aField[ MYSQL_FS_CLIP_TYPE ] )
             ELSE
                uValue = ::aRow[ nIdx ]
                cWhere += If( ! IS_NOT_NULL( aField[ MYSQL_FS_FLAGS ] ) .AND. ;
                              ( uValue == NIL .OR. ( HB_IsString( uValue ) .AND. Empty( uValue ) ) ), " IS ", " = " )
                cWhere += ClipValue2SQL( uValue, aField[ MYSQL_FS_CLIP_TYPE ] )
-            ENDIF         
+            ENDIF
 #endif /*USE_HASH*/
             cWhere += " AND "
             lPrimary = .T.
          ENDIF
-   
+
       NEXT
-   
+
       IF lPrimary
       // remove last " AND "
          cWhere := Left( cWhere, Len( cWhere ) - 5 )
       ENDIF
-      
+
 //   ENDIF
 
 RETURN cWhere
@@ -1431,22 +1437,22 @@ METHOD NextPage( nSkip, lRefresh ) CLASS TDolphinQry
 
       ::nTotalRows    := ::oServer:GetRowsFromQry( Self )
       ::nMaxPages     = Int( ::nTotalRows / ::nPageStep ) + If( ::nTotalRows % ::nPageStep > 0, 1, 0 )
-   
+
       IF ::nCurrentPage + nSkip < ::nMaxPages
-         ::nCurrentLimit += ( ::nPageStep * nSkip ) 
-         ::nCurrentPage  += nSkip    
-      ELSE 
+         ::nCurrentLimit += ( ::nPageStep * nSkip )
+         ::nCurrentPage  += nSkip
+      ELSE
          ::nCurrentLimit = Max( ::nTotalRows - ::nPageStep, 0 )
          ::nCurrentPage  = ::nMaxPages
       ENDIF
 
-      ::SetLimit( AllTrim( Str( ::nCurrentLimit ) ) + "," + AllTrim( Str( ::nPageStep ) ), lRefresh ) 
+      ::SetLimit( AllTrim( Str( ::nCurrentLimit ) ) + "," + AllTrim( Str( ::nPageStep ) ), lRefresh )
 
       IF ::lPagination .AND. ::bOnChangePage != NIL .AND. lRefresh
          Eval( ::bOnChangePage, .F. )
-      ENDIF     
+      ENDIF
 
-      
+
    ENDIF
 
 RETURN NIL
@@ -1463,22 +1469,22 @@ METHOD PrevPage( nSkip, lRefresh ) CLASS TDolphinQry
 
       ::nTotalRows    := ::oServer:GetRowsFromQry( Self )
       ::nMaxPages     = Int( ::nTotalRows / ::nPageStep ) + If( ::nTotalRows % ::nPageStep > 0, 1, 0 )
-   
+
       IF ::nCurrentPage - nSkip > 0
          ::nCurrentLimit -= ( ::nPageStep * nSkip )
-         ::nCurrentPage  -= nSkip    
+         ::nCurrentPage  -= nSkip
          ::nCurrentPage = Max( 1, ::nCurrentPage )
          ::nCurrentLimit = Max( 0, ::nCurrentLimit )
-      ELSE 
+      ELSE
          ::nCurrentLimit = 0
          ::nCurrentPage  = 1
       ENDIF
-      ::SetLimit( AllTrim( Str( ::nCurrentLimit ) ) + "," + AllTrim( Str( ::nPageStep ) ), lRefresh ) 
+      ::SetLimit( AllTrim( Str( ::nCurrentLimit ) ) + "," + AllTrim( Str( ::nPageStep ) ), lRefresh )
 
       IF ::lPagination .AND. ::bOnChangePage != NIL .AND. lRefresh
          Eval( ::bOnChangePage, .T. )
-      ENDIF     
-   
+      ENDIF
+
    ENDIF
 
 RETURN NIL
@@ -1489,7 +1495,7 @@ METHOD Refresh( lBuild ) CLASS TDolphinQry
 
    DEFAULT lBuild TO .F.
 /* Agosto 25.: Esto debe acelerar los refrescos, no se que impacto puede tener.
-      Biel    ..: Entiendo que si no se cambia la sentencia SQL ninguno, ya lo descubriremos.
+      Biel    ..: Entiendo que si no se cambia la sentencia SQL, ninguno, ya lo descubriremos.
       En el fondo usa la sentencia original, sin reconstruir con BuildQuery
    IF At('DESC DESC',::cOrder)!=0 //Biel 1609
       ::cOrder:=StrTran(::cOrder,'DESC DESC','DESC') //Habria que buscar porque dobla DESC en cOrder, esto lo soluciona, pero no desde la base del problema.
@@ -1508,27 +1514,27 @@ METHOD Save() CLASS TDolphinQry
    LOCAL cTable
    LOCAL aField
    LOCAL cQry := ""
-   LOCAL uValue  
+   LOCAL uValue
    LOCAL uOldValue
    LOCAL nIdx
    LOCAL lSaveOk := .F.
    LOCAL lChanged := .F.
    LOCAL cPrimary
-   
-#ifndef NOINTERNAL   
+
+#ifndef NOINTERNAL
    IF ! ::IsSingleTable()
       ::oServer:nInternalError = ERR_INVALIDSAVE
       ::CheckError()
-      RETURN NIL 
+      RETURN NIL
    ENDIF
-#endif    
-   
+#endif
+
    cTable = ::aTables[ 1 ]
 
-    IF ::oRow != NIL 
+    IF ::oRow != NIL
        ::oRow:SetData()
        ::oRow = NIL
-    ENDIF 
+    ENDIF
 
    IF ! ::lAppend
       cQry += "UPDATE " + D_LowerCase( cTable ) + " SET "
@@ -1537,7 +1543,7 @@ METHOD Save() CLASS TDolphinQry
    ENDIF
 
    FOR EACH aField IN ::aStructure
-      
+
       IF ::lAppend
          lSaveOk = .T.
          //lChanged = .T. //Biel 1709
@@ -1564,7 +1570,7 @@ METHOD Save() CLASS TDolphinQry
             lChanged = .T.
          ENDIF
       ENDIF
-      IF lChanged 
+      IF lChanged
          cQry += aField[ MYSQL_FS_NAME ] + "=" + ClipValue2SQL( uValue, , , IS_NOT_NULL( aField[ MYSQL_FS_FLAGS ] ) ) + ","
          lSaveOk = .T.
       ENDIF
@@ -1581,9 +1587,9 @@ METHOD Save() CLASS TDolphinQry
 
       IF ::oServer:SqlQuery( cQry )
          ::LoadQuery()
-      ENDIF         
+      ENDIF
    ENDIF
-   
+
    ::lAppend = .F.
 
 RETURN lSaveOk
@@ -1594,11 +1600,11 @@ METHOD Seek( uSeek, cnField, nStart, nEnd, lSoft, lRefresh ) CLASS TDolphinQry
 
    LOCAL nNum
    LOCAL nSeek
-   
+
    DEFAULT lSoft     TO .F.
    DEFAULT lRefresh  TO .T.
 
-   IF ::nRecCount == 0 
+   IF ::nRecCount == 0
       RETURN 0
    ENDIF
 
@@ -1607,41 +1613,41 @@ METHOD Seek( uSeek, cnField, nStart, nEnd, lSoft, lRefresh ) CLASS TDolphinQry
    IF ::aStructure[ nNum ][ MYSQL_FS_CLIP_TYPE ] == "N"
       uSeek = If( ValType( uSeek ) != "N", Val( uSeek ),uSeek )
    ELSEIF ::aStructure[ nNum ][ MYSQL_FS_CLIP_TYPE ] == "D"
-      //no supported field type date 
+      //no supported field type date
       RETURN 0
    ENDIF
 
    nSeek = MySeek2( ::hResult, nNum, ClipValue2SQL( uSeek, ::aStructure[ nNum ][ MYSQL_FS_CLIP_TYPE ], .F. ), nStart, nEnd, lSoft, ::lInverted )
 
-   IF nSeek > 0 
+   IF nSeek > 0
       IF lRefresh
          ::GetRow( nSeek )
       ENDIF
-   ELSE 
+   ELSE
       nSeek = 0
    ENDIF
 
-RETURN nSeek 
+RETURN nSeek
 
 
 //----------------------------------------------------//
 
 
-METHOD SetData( cnField, uValue )	CLASS TDolphinQry
+METHOD SetData( cnField, uValue )   CLASS TDolphinQry
 
    LOCAL cCol
    LOCAL nNum := ::FieldToNum( cnField )
-   
+
 #ifdef USE_HASH
 
    cCol := "_" + ::aStructure[ nNum ][ MYSQL_FS_NAME ]
    HSet( ::hRow, cCol, uValue )
    HSet( ::hOldRow, cCol, uValue )
 
-#else 
+#else
    ::aRow[ nNum ]    = uValue
    ::aOldRow[ nNum ] = uValue
-#endif /*USE_HASH*/    
+#endif /*USE_HASH*/
 
 RETURN NIL
 
@@ -1649,13 +1655,13 @@ RETURN NIL
 //----------------------------------------------------//
 
 
-METHOD SetNewFilter( nType, cFilter, lRefresh ) CLASS TDolphinQry 
+METHOD SetNewFilter( nType, cFilter, lRefresh ) CLASS TDolphinQry
    LOCAL cOldFilter
    LOCAL l := .T.
 
    DEFAULT lRefresh TO .T.
-   
-   
+
+
    SWITCH nType
       CASE SET_WHERE
          cOldFilter = ::cWhere
@@ -1663,18 +1669,18 @@ METHOD SetNewFilter( nType, cFilter, lRefresh ) CLASS TDolphinQry
          EXIT
       CASE SET_GROUP
          cOldFilter = ::cGroup
-         ::cGroup = cFilter 
+         ::cGroup = cFilter
          EXIT
       CASE SET_HAVING
-         cOldFilter = ::cHaving      
+         cOldFilter = ::cHaving
          ::cHaving = cFilter
          EXIT
       CASE SET_ORDER
-         cOldFilter = ::cOrder      
-         ::cOrder = cFilter 
+         cOldFilter = ::cOrder
+         ::cOrder = cFilter
          EXIT
       CASE SET_LIMIT
-         cOldFilter = ::cLimit  
+         cOldFilter = ::cLimit
          IF ValType( cFilter ) == "C"
             ::cLimit = cFilter
          ELSEIF ValType( cFilter ) == "N"
@@ -1684,22 +1690,22 @@ METHOD SetNewFilter( nType, cFilter, lRefresh ) CLASS TDolphinQry
    ENDSWITCH
 
    if ::bOnNewFilter != NIL
-      // if you want change query, do it here, 
+      // if you want change query, do it here,
       // return .F. to skip BuildQuery and call BuildDatas()
       // return .T. to call BuildQuery()
       // isn't recommended return .T. with Sub-Select
       l = Eval( ::bOnNewFilter, Self, nType )
-      // Convert automatically to logical value 
+      // Convert automatically to logical value
       l = ValType( l ) == "L" .and. l
-   endif 
-   if l 
+   endif
+   if l
       ::cQuery := ::BuildQuery( ::aColumns, ::aTables, ::cWhere, ::cGroup, ::cHaving, ::cOrder, ::cLimit )
-   else 
+   else
       ::BuildDatas( ::cQuery )
-   endif 
-   
-   
-   IF lRefresh 
+   endif
+
+
+   IF lRefresh
       ::LoadQuery( .F. )
    ENDIF
 
@@ -1711,18 +1717,18 @@ METHOD SetPages( nLimit ) CLASS TDolphinQry
 
    DEFAULT nLimit TO 100
 
-   ::lPagination = .T. 
-   
+   ::lPagination = .T.
+
    ::nPageStep     = nLimit
    ::nCurrentLimit = 0
-   ::nCurrentPage  = 1 
-   
+   ::nCurrentPage  = 1
+
    ::nTotalRows    = ::oServer:GetRowsFromQry( Self )
-   
+
    ::nMaxPages     = Int( ::nTotalRows / nLimit ) + If( ::nTotalRows % nLimit > 0, 1, 0 )
-   
-   ::SetLimit( AllTrim( Str( ::nCurrentLimit ) ) + "," + AllTrim( Str( nLimit ) ), .F. ) 
-   
+
+   ::SetLimit( AllTrim( Str( ::nCurrentLimit ) ) + "," + AllTrim( Str( nLimit ) ), .F. )
+
 
 RETURN NIL
 
@@ -1735,7 +1741,7 @@ METHOD Skip( nRecords ) CLASS TDolphinQry
 
    DEFAULT nRecords TO 1
 
-   ::nRecNo += nRecords 
+   ::nRecNo += nRecords
 
    IF ::GetRow( ::nRecNo ) > 0  .AND. nRecords != 0
 
@@ -1744,16 +1750,16 @@ METHOD Skip( nRecords ) CLASS TDolphinQry
             Eval( ::bEoF, Self )
          ENDIF
       ENDIF
-   
+
       IF ::BoF()
          IF ::bBoF != nil
             Eval( ::bBoF, Self )
          ENDIF
       ENDIF
-      
+
    ENDIF
-  
-   
+
+
 RETURN ::nRecNo - n
 
 //----------------------------------------------------//
@@ -1763,8 +1769,8 @@ METHOD Undo( cnField ) CLASS TDolphinQry
 
    LOCAL nNum := 0
    LOCAL uRow, uOldRow
-   
-   IF cnField != NIL 
+
+   IF cnField != NIL
       nNum := ::FieldToNum( cnField )
    ENDIF
 
@@ -1777,36 +1783,36 @@ METHOD Undo( cnField ) CLASS TDolphinQry
       uOldRow = ::hOldRow
    ENDIF
 
-   IF nNum == 0 
+   IF nNum == 0
       uRow = HClone( uOldRow )
-   ELSE 
+   ELSE
       HSet( uRow, "_" + ::aStructure[ nNum ][ MYSQL_FS_NAME ], uOldRow[ "_" + ::aStructure[ nNum ][ MYSQL_FS_NAME ] ] )
-   ENDIF 
+   ENDIF
 
-#else 
+#else
       uRow = ::aRow
       uOldRow = ::aOldRow
    ENDIF
-   
-   IF nNum == 0 
-      uRow = AClone( uOldRow )
-   ELSE 
-      uRow[ nNum ] = uOldRow[ nNum ]
-   ENDIF 
-   
-#endif /*USE_HASH*/    
 
-   IF ::oRow != NIL 
+   IF nNum == 0
+      uRow = AClone( uOldRow )
+   ELSE
+      uRow[ nNum ] = uOldRow[ nNum ]
+   ENDIF
+
+#endif /*USE_HASH*/
+
+   IF ::oRow != NIL
       ::oRow:uRow = uRow
       ::oRow:uOldRow = uOldRow
    ELSE
 #ifdef USE_HASH
       ::hRow = uRow
-      ::hOldRow = uOldRow      
-#else   
+      ::hOldRow = uOldRow
+#else
       ::aRow = uRow
       ::aOldRow = uOldRow
-#endif /*USE_HASH*/    
+#endif /*USE_HASH*/
    ENDIF
 
 
@@ -1831,12 +1837,12 @@ METHOD VerifyValue( nIdx, cField ) CLASS TDolphinQry
          EXIT
 
       CASE "N"
-       
+
          IF cField == NIL .OR. Empty(cField)
             uValue = If( IS_NOT_NULL( ::aStructure[ nIdx ][ MYSQL_FS_FLAGS ] ), 0, cField )
          ELSE
             uValue = If( ValType( cField ) == "N", cField, Val( cField ) )
-         ENDIF     
+         ENDIF
          EXIT
 
       CASE "D"
@@ -1865,20 +1871,20 @@ METHOD VerifyValue( nIdx, cField ) CLASS TDolphinQry
          IF D_SetPadRight()
             nPad = Min( If( ::aStructure[ nIdx ][ MYSQL_FS_MAXLEN ] > ::aStructure[ nIdx ][ MYSQL_FS_LENGTH ],;
                       ::aStructure[ nIdx ][ MYSQL_FS_MAXLEN ], ::aStructure[ nIdx ][ MYSQL_FS_LENGTH] ), MAX_BLOCKSIZE )
-         ELSE 
-            nPad = 0 
+         ELSE
+            nPad = 0
          ENDIF
          IF ( cField == NIL .OR. Empty(cField) )
             uValue = If( IS_NOT_NULL( ::aStructure[ nIdx ][ MYSQL_FS_FLAGS ] ), PadR(nPad), cField )
          ELSE
-            uValue := PadR( cField, Max( Len( cField ), nPad ) ) 
+            uValue := PadR( cField, Max( Len( cField ), nPad ) )
          ENDIF
-         
+
          EXIT
 #ifdef __XHARBOUR__
       DEFAULT
 #else
-      OTHERWISE 
+      OTHERWISE
 #endif
   //       uValue = cField
       ENDSWITCH
@@ -1892,17 +1898,17 @@ METHOD ONERROR( uParam1 ) CLASS TDolphinQry
       LOCAL cCol   := __GetMessage()
       LOCAL lAssign := .F., nCol
       LOCAL oError := ErrorNew()
-      LOCAL nError := If( SubStr( cCol, 1, 1 ) == "_", 1005, 1004 )      
+      LOCAL nError := If( SubStr( cCol, 1, 1 ) == "_", 1005, 1004 )
       LOCAL nPos
 
-#ifdef USE_HASH    
+#ifdef USE_HASH
 
    //the fieldname always are lower case
-   
+
       cCol = Lower( If( Left( cCol, 1 ) == '_' , SubStr( cCol, 2 ), cCol ) )
 
-      IF ! ( uParam1 == NIL ) 
-         IF hGetPos( ::hRow, "_"+cCol ) > 0           
+      IF ! ( uParam1 == NIL )
+         IF hGetPos( ::hRow, "_"+cCol ) > 0
             ::FieldPut( cCol, uParam1 )
             RETURN uParam1
          ENDIF
@@ -1916,17 +1922,17 @@ METHOD ONERROR( uParam1 ) CLASS TDolphinQry
       IF( nCol := ::FieldPos( cCol ) ) > 0
          RETURN If( lAssign, ::FieldPut( nCol, uParam1 ), ::FieldGet( cCol ) )
       ENDIF
-     
+
 #endif /*USE_HASH*/
 
    oError:SubSystem   = "BASE"
    oError:SubCode     = nError
    oError:Severity    = 2 // ES_ERROR
    oError:Description = "Message not found"
-   oError:Operation   = "TDOLPHYNQRY: " + cCol   
+   oError:Operation   = "TDOLPHYNQRY: " + cCol
 
    Eval( ErrorBlock(), oError )
-      
+
 
 RETURN NIL
 
@@ -1939,14 +1945,14 @@ CLASS TDolphinRow
    DATA uRow
    DATA uOldRow
    DATA oQuery
-   DATA nRecno 
-   
-   METHOD New( oQuery )
-   METHOD SetData()	
+   DATA nRecno
 
-   ERROR HANDLER ONERROR()  
-   
-ENDCLASS 
+   METHOD New( oQuery )
+   METHOD SetData()
+
+   ERROR HANDLER ONERROR()
+
+ENDCLASS
 
 //----------------------------------------------------//
 
@@ -1958,7 +1964,7 @@ METHOD New( oQuery ) CLASS TDolphinRow
 #ifdef USE_HASH
    ::uRow = HClone( oQuery:hRow )
    ::uOldRow = HClone( oQuery:hOldRow )
-#else 
+#else
    ::uRow = AClone( oQuery:aRow )
    ::uOldRow = AClone( oQuery:aOldRow )
 #endif
@@ -1973,7 +1979,7 @@ METHOD SetData() CLASS TDolphinRow
 #ifdef USE_HASH
    ::oQuery:hRow = HClone( ::uRow )
    ::oQuery:hOldRow = HClone( ::uOldRow )
-#else 
+#else
    ::oQuery:aRow = AClone( ::uRow )
    ::oQuery:aOldRow = AClone( ::uOldRow )
 #endif
@@ -1985,17 +1991,17 @@ RETURN NIL
 METHOD ONERROR( uParam1 ) CLASS TDolphinRow
       LOCAL cCol   := __GetMessage()
       LOCAL lAssign, nCol
-      LOCAL nPos, a 
+      LOCAL nPos, a
 
-#ifdef USE_HASH    
+#ifdef USE_HASH
 
    //the fieldname always are lower case
-   
+
       cCol = Lower( If( lAssign := Left( cCol, 1 ) == '_' , SubStr( cCol, 2 ), cCol ) )
 
-      IF ! ( uParam1 == NIL ) 
-         IF hGetPos( ::uRow, "_" + cCol ) > 0   
-             
+      IF ! ( uParam1 == NIL )
+         IF hGetPos( ::uRow, "_" + cCol ) > 0
+
             HSet( ::uRow, "_" + cCol, uParam1 )
             RETURN uParam1
          ENDIF
@@ -2015,7 +2021,7 @@ METHOD ONERROR( uParam1 ) CLASS TDolphinRow
 
    IF ! lAssign
       cCol = StrTran( cCol, "()", "" )
-   ELSE 
+   ELSE
       cCol = "_" + cCol
    ENDIF
 
@@ -2025,15 +2031,15 @@ METHOD ONERROR( uParam1 ) CLASS TDolphinRow
    ELSE
       a = __ObjSendMsg( ::oQuery, cCol, uParam1 )
    ENDIF
-#else   
+#else
 
    IF uParam1 == nil
       a = hb_execFromArray( @::oQuery, cCol )
    ELSE
       a = hb_execFromArray( @::oQuery, cCol, { uParam1 } )
    ENDIF
-#endif 
-      
+#endif
+
 
 RETURN a
 
@@ -2044,7 +2050,7 @@ RETURN uValue
 //----------------------------------------------------//
 
 STATIC FUNCTION TransformQueryParams( cQuery, uParams )
-   
+
    LOCAL aKeys, uItem, nLen
 
    IF uParams != NIL
@@ -2058,7 +2064,7 @@ STATIC FUNCTION TransformQueryParams( cQuery, uParams )
          FOR uItem = 1 TO nLen
             cQuery = StrTran( cQuery, "&"+Alltrim( Str( uItem ) ), uParams[uItem])
          NEXT
-      ENDIF 
+      ENDIF
    ENDIF
 
 RETURN cQuery
