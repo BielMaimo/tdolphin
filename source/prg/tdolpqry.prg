@@ -1875,7 +1875,7 @@ METHOD VerifyValue( nIdx, cField ) CLASS TDolphinQry
             nPad = 0
          ENDIF
          IF ( cField == NIL .OR. Empty(cField) )
-            uValue = If( IS_NOT_NULL( ::aStructure[ nIdx ][ MYSQL_FS_FLAGS ] ), PadR(nPad), cField )
+            uValue = If( IS_NOT_NULL( ::aStructure[ nIdx ][ MYSQL_FS_FLAGS ] ), Space(nPad), cField )
          ELSE
             uValue := PadR( cField, Max( Len( cField ), nPad ) )
          ENDIF
