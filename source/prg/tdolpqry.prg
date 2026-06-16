@@ -1830,7 +1830,7 @@ METHOD VerifyValue( nIdx, cField ) CLASS TDolphinQry
    SWITCH cType
       CASE "L"
          IF cField == NIL .OR. Empty(cField)
-             uValue = If( IS_NOT_NULL( ::aStructure[ nIdx ][ MYSQL_FS_FLAGS ] ), .F., cField )
+            uValue = .F.
          ELSE
             uValue := If( ValType( cField ) == "L", cField, !( Val( cField ) == 0 ) )
          ENDIF
@@ -1839,15 +1839,15 @@ METHOD VerifyValue( nIdx, cField ) CLASS TDolphinQry
       CASE "N"
 
          IF cField == NIL .OR. Empty(cField)
-            uValue = If( IS_NOT_NULL( ::aStructure[ nIdx ][ MYSQL_FS_FLAGS ] ), 0, cField )
+            uValue = 0
          ELSE
             uValue = If( ValType( cField ) == "N", cField, Val( cField ) )
          ENDIF
          EXIT
 
       CASE "D"
-         IF Empty( cField ) .OR. Empty(cField)
-            uValue = If( IS_NOT_NULL( ::aStructure[ nIdx ][ MYSQL_FS_FLAGS ] ),  CToD( "" ), cField )
+         IF Empty( cField )
+            uValue := CToD( "" )
          ELSE
             uValue := If( ValType( cField ) == "D", cField, SqlDate2Clip( cField ) )
          ENDIF
@@ -1875,7 +1875,7 @@ METHOD VerifyValue( nIdx, cField ) CLASS TDolphinQry
             nPad = 0
          ENDIF
          IF ( cField == NIL .OR. Empty(cField) )
-            uValue = If( IS_NOT_NULL( ::aStructure[ nIdx ][ MYSQL_FS_FLAGS ] ), Space(nPad), cField )
+            uValue = Space(nPad)
          ELSE
             uValue := PadR( cField, Max( Len( cField ), nPad ) )
          ENDIF
