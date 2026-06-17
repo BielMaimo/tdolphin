@@ -1861,10 +1861,12 @@ METHOD VerifyValue( nIdx, cField ) CLASS TDolphinQry
          ENDIF
          EXIT
       CASE "T"
-         IF ValType( cField )=="T"    //Biel 1709
-            uValue:=HB_TTOS( cField ) //Biel 1709
-         ELSE                         //Biel 1709
-            uValue:=""                //Biel 1709
+         IF ValType( cField )=="T"          //Biel 1709
+            uValue:=HB_TTOS( cField )       //Biel 1709
+         ELSEIF ValType( cField )=="C" .AND. !Empty( cField )  //Biel 1706
+            uValue:=AllTrim( cField )       //Biel 1706 - valor crudo de MySQL (YYYY-MM-DD HH:MM:SS)
+         ELSE                               //Biel 1709
+            uValue:=""                      //Biel 1709
          ENDIF
          EXIT
       CASE "C"
