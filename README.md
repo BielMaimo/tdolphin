@@ -18,4 +18,4 @@ Fork mantenido de [TDolphin](https://bitbucket.org/USUARIO_ORIGINAL/tdolphin) (D
 build_bcc77.bat
 ```
 
-Requiere Harbour + BCC 7.7. Ver `CLAUDE.md` para detalles del entorno y decisiones de diseño.
+Requiere Harbour + BCC 7.7. 
