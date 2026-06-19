@@ -1,8 +1,21 @@
-# TDolphin - fork mantenido por Biel Maimó
+# tDolphin
 
-Este repositorio es una copia mantenida/fork del proyecto original TDolphin de Daniel García-Gil.
+**ORM/acceso a MariaDB/MySQL para Harbour + FiveWin**
 
-Repositorio original:
-https://bitbucket.org/USUARIO_ORIGINAL/tdolphin
+Fork mantenido de [TDolphin](https://bitbucket.org/USUARIO_ORIGINAL/tdolphin) (Daniel García-Gil) con optimizaciones y adaptaciones para uso propio.
 
-Este fork incorpora cambios de mantenimiento, optimización y adaptación para uso propio.
+## Clases principales
+
+| Clase | Descripción |
+|-------|-------------|
+| `TDolphinSrv` | Conexión al servidor MariaDB/MySQL |
+| `TDolphinQry` | Queries, resultados y operaciones CRUD |
+| `TDolphinExport` | Exportación a DBF, Excel, HTML, Word |
+
+## Compilación
+
+```batch
+build_bcc77.bat
+```
+
+Requiere Harbour + BCC 7.7. Ver `CLAUDE.md` para detalles del entorno y decisiones de diseño.
