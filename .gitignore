@@ -17,4 +17,5 @@ samples/*
 !samples/*.rc
 !samples/*.res
 !samples/*.res
+*.bak
 
