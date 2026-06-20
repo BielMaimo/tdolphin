@@ -107,6 +107,8 @@ CLASS TDolphinSrv
 
    DATA aQueries       /*Array queries actives*/
 
+   DATA hDefCache INIT {=>}  /* cache de defaults por tabla, evita MySqlListFields repetidos */ // Biel 2606
+
    METHOD New( cHost, cUser, cPassword, nPort, nFlags, bOnError, cDBName )
    METHOD ssl( cHost, cUser, cPassword, nPort, nFlags, bOnError, cDBName, cSslKeyFile, cSslCertFile, cSslCaFile, cCertsPath, cSslCipher )
 
@@ -124,6 +126,7 @@ CLASS TDolphinSrv
 
    METHOD b6Def( cField, cTable )     /* Returns default value for a single field */          // Biel 2606
    METHOD b6DefAll( cTable )          /* Returns hash { fieldname => default } for all fields in one call */ // Biel 2606
+   METHOD ClearDefCache( cTable )     /* Invalida la cache de defaults (toda o de una tabla) */ // Biel 2606
 
    METHOD BeginTransaction()          INLINE ::SqlQuery( "BEGIN" )
 
@@ -1742,6 +1745,12 @@ METHOD b6DefAll( cTable ) CLASS TDolphinSrv  // Biel 2606
 
    cTable = D_LowerCase( cTable )
 
+   /* Los DEFAULT del schema no cambian en tiempo de ejecucion: se cachean por
+      tabla para evitar un MySqlListFields en cada LoadQuery/Refresh/Save. */ // Biel 2606
+   IF hb_hHasKey( ::hDefCache, cTable )
+      RETURN ::hDefCache[ cTable ]
+   ENDIF
+
    hRes = MySqlListFields( ::hMysql, cTable )
 
    IF hRes == NIL
@@ -1749,11 +1758,27 @@ METHOD b6DefAll( cTable ) CLASS TDolphinSrv  // Biel 2606
    ELSE
       aStruct = MySqlResultStructure( hRes, D_SetCaseSensitive(), D_LogicalValue() )
       AEval( aStruct, {|a| hDef[ a[ MYSQL_FS_NAME ] ] := a[ MYSQL_FS_DEF ] } )
+      ::hDefCache[ cTable ] := hDef
    ENDIF
 
    hRes = NIL
 
 RETURN hDef
+
+//----------------------------------------------------//
+
+METHOD ClearDefCache( cTable ) CLASS TDolphinSrv  // Biel 2606
+
+   IF cTable == NIL
+      ::hDefCache := {=>}
+   ELSE
+      cTable = D_LowerCase( cTable )
+      IF hb_hHasKey( ::hDefCache, cTable )
+         hb_hDel( ::hDefCache, cTable )
+      ENDIF
+   ENDIF
+
+RETURN NIL
 
 //----------------------------------------------------//
 
